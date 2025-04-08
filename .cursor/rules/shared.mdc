@@ -1,0 +1,32 @@
+# AI Rules for 10xCards
+1xCards is a web application that automatic generation of flashcards using AI. The aim of the project is to siqnificantly speed up and simply the process of creating fiches, enabling users to  quickly trnsform the text they enter (copy-paste) into high-quality flashcards for learning.
+
+## Tech Stack
+
+- Mud Blazor
+- ASP.NET Core
+- Minimal API
+- ASP.NET Core Identity
+- Entiti Framework
+- Microsoft SQL Server
+
+## Project Structure
+
+-`./src` - source code
+./Controllers - Folder zawierający kontrolery API.
+./Infrastructure - Warstwa infrastruktury, m.in. implementacja dostępu do danych.
+./Core - Główna logika biznesowa aplikacji.
+./SQL - Skrypty SQL, migracje lub procedury bazodanowe.
+./Helpers - Klasy pomocnicze i narzędzia wspierające.
+./Application - Warstwa aplikacji, przykładowo przypadki użycia.
+./Extensions - Metody rozszerzające oraz dodatkowe konfiguracje.
+./Providers - Implementacje providerów, np. usługi integracyjne.
+IoCExtensions.cs – Rozszerzenia dla konfiguracji IoC.
+
+## Coding practices
+
+
+### Guidelines for clean code
+
+- Use feedback from linters to improve the code when making changes.
+- Consider using custom error types or error factories for consistent error handling.
