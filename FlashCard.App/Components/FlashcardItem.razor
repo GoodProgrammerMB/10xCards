@@ -1,0 +1,75 @@
+@using FlashCard.App.Models
+
+<MudCard>
+    <MudCardContent>
+        <div class="d-flex justify-space-between align-center mb-2">
+            <MudText Typo="Typo.subtitle1">Przód</MudText>
+            @if (Flashcard.Edited == true)
+            {
+                @* <MudChip Size="Size.Small" Color="Color.Info">Edytowano</MudChip> *@
+            }
+        </div>
+        <MudText Class="mb-4">@Flashcard.Front</MudText>
+        
+        <MudDivider Class="my-2"/>
+        
+        <MudText Typo="Typo.subtitle1" Class="mt-2 mb-2">Tył</MudText>
+        <MudText>@Flashcard.Back</MudText>
+    </MudCardContent>
+    
+    <MudCardActions Class="d-flex justify-space-between">
+        @if (Flashcard.Accepted == null)
+        {
+            <MudButton StartIcon="@Icons.Material.Filled.Check"
+                       Color="Color.Success"
+                       OnClick="@(() => OnAccept.InvokeAsync())">
+                Akceptuj
+            </MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.Edit"
+                       Color="Color.Info"
+                       OnClick="@(() => OnEdit.InvokeAsync())">
+                Edytuj
+            </MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.Close"
+                       Color="Color.Error"
+                       OnClick="@(() => OnReject.InvokeAsync())">
+                Odrzuć
+            </MudButton>
+        }
+        else if (Flashcard.Accepted == true)
+        {
+            <MudButton StartIcon="@Icons.Material.Filled.Edit"
+                       Color="Color.Info"
+                       OnClick="@(() => OnEdit.InvokeAsync())">
+                Edytuj
+            </MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.Undo"
+                       Color="Color.Warning"
+                       OnClick="@(() => OnReject.InvokeAsync())">
+                Cofnij akceptację
+            </MudButton>
+        }
+        else
+        {
+            <MudButton StartIcon="@Icons.Material.Filled.Undo"
+                       Color="Color.Warning"
+                       OnClick="@(() => OnAccept.InvokeAsync())">
+                Przywróć
+            </MudButton>
+        }
+    </MudCardActions>
+</MudCard>
+
+@code {
+    [Parameter]
+    public FlashcardViewModel Flashcard { get; set; }
+    
+    [Parameter]
+    public EventCallback OnAccept { get; set; }
+    
+    [Parameter]
+    public EventCallback OnEdit { get; set; }
+    
+    [Parameter]
+    public EventCallback OnReject { get; set; }
+} 

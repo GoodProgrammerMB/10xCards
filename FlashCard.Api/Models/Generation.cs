@@ -9,6 +9,9 @@ public class Generation
     public int Id { get; set; }
     
     [Required]
+    public string Name { get; set; } = string.Empty;
+    
+    [Required]
     public int UserId { get; set; }
     
     [Required]
@@ -26,6 +29,15 @@ public class Generation
     
     // Navigation properties
     [ForeignKey(nameof(UserId))]
-    public User? User { get; set; }
-    public ICollection<Flashcard> Flashcards { get; set; } = new List<Flashcard>();
+    public virtual User User { get; set; } = null!;
+    public virtual ICollection<Flashcard> Flashcards { get; set; } = new HashSet<Flashcard>();
+    public virtual ICollection<GenerationErrorLog> GenerationErrorLogs { get; set; } = new HashSet<GenerationErrorLog>();
+
+    public Generation()
+    {
+        CreatedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
+        Flashcards = new HashSet<Flashcard>();
+        GenerationErrorLogs = new HashSet<GenerationErrorLog>();
+    }
 } 

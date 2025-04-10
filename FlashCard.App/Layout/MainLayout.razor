@@ -1,0 +1,61 @@
+@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
+@using FlashCard.App.Services
+@using MudBlazor
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar>
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
+        <MudText Typo="Typo.h6">10xCards</MudText>
+        <MudSpacer />
+        <AuthorizeView>
+            <Authorized>
+                <MudButton Color="Color.Inherit" OnClick="Logout">Wyloguj</MudButton>
+            </Authorized>
+            <NotAuthorized>
+                <MudButton Color="Color.Inherit" OnClick="@(() => NavigationManager.NavigateTo("login"))">Zaloguj</MudButton>
+            </NotAuthorized>
+        </AuthorizeView>
+    </MudAppBar>
+
+    <MudDrawer @bind-Open="@drawerOpen">
+        <MudNavMenu>
+            <MudNavLink Href="/" Match="NavLinkMatch.All">Strona główna</MudNavLink>
+            <AuthorizeView>
+                <Authorized>
+                    <MudNavLink Href="/generowanie">Generowanie fiszek</MudNavLink>
+                    <MudNavLink Href="/moje-fiszki">Moje fiszki</MudNavLink>
+                </Authorized>
+            </AuthorizeView>
+        </MudNavMenu>
+    </MudDrawer>
+
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Large" Class="my-4">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private bool drawerOpen = true;
+
+    private void ToggleDrawer()
+    {
+        drawerOpen = !drawerOpen;
+    }
+
+    private async Task Logout()
+    {
+        await AuthService.Logout();
+        NavigationManager.NavigateTo("/");
+        Snackbar.Add("Wylogowano pomyślnie", Severity.Success);
+    }
+} 

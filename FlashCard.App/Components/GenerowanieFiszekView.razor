@@ -1,0 +1,127 @@
+@page "/generowanie"
+@using FlashCard.App.Models
+@using Microsoft.AspNetCore.Authorization
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@attribute [Authorize]
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <MudPaper Class="pa-4">
+        <MudForm @ref="form" Model="@request">
+            <MudTextField @bind-Value="request.SourceText"
+                         Label="Tekst źródłowy"
+                         Lines="10"
+                         Required="true"
+                         RequiredError="Tekst źródłowy jest wymagany" />
+            <MudSelect @bind-Value="request.Model" Label="Model" Required="true" RequiredError="Model jest wymagany">
+                <MudSelectItem Value="@("gpt-3.5-turbo")">GPT-3.5 Turbo</MudSelectItem>
+                <MudSelectItem Value="@("gpt-4")">GPT-4</MudSelectItem>
+            </MudSelect>
+            <MudButton Color="Color.Primary" OnClick="GenerateFlashcards" Class="mt-4">Generuj fiszki</MudButton>
+        </MudForm>
+    </MudPaper>
+
+    @if (isLoading)
+    {
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-4" />
+    }
+
+    @if (flashcards != null && flashcards.Any())
+    {
+        <MudPaper Class="pa-4 mt-4">
+            <MudText Typo="Typo.h6" Class="mb-4">Wygenerowane fiszki</MudText>
+            <MudList Items="@flashcards" T="GeneratedFlashcard">
+                @foreach (var flashcard in flashcards)
+                {
+                    <MudListItem T="GeneratedFlashcard" Value="@flashcard">
+                        <MudCard>
+                            <MudCardContent>
+                                <MudText Typo="Typo.body1"><strong>Pytanie:</strong> @flashcard.Front</MudText>
+                                <MudText Typo="Typo.body1"><strong>Odpowiedź:</strong> @flashcard.Back</MudText>
+                            </MudCardContent>
+                            <MudCardActions>
+                                <MudButton OnClick="@(() => EditFlashcard(flashcard))">Edytuj</MudButton>
+                                <MudButton OnClick="@(() => DeleteFlashcard(flashcard))">Usuń</MudButton>
+                            </MudCardActions>
+                        </MudCard>
+                    </MudListItem>
+                }
+            </MudList>
+            <MudButton Color="Color.Primary" OnClick="SaveFlashcards" Class="mt-4">Zapisz wszystkie fiszki</MudButton>
+        </MudPaper>
+    }
+</MudContainer>
+
+@code {
+    private MudForm form = null!;
+    private GenerationRequest request = new();
+    private bool isLoading;
+    private List<GeneratedFlashcard> flashcards = new();
+
+    private async Task GenerateFlashcards()
+    {
+        await form.Validate();
+        if (!form.IsValid) return;
+
+        isLoading = true;
+        try
+        {
+            // TODO: Implement generation logic
+            await Task.Delay(2000); // Simulate API call
+            flashcards = new List<GeneratedFlashcard>
+            {
+                new() { Front = "Sample question 1", Back = "Sample answer 1" },
+                new() { Front = "Sample question 2", Back = "Sample answer 2" }
+            };
+            Snackbar.Add("Fiszki zostały wygenerowane", Severity.Success);
+        }
+        catch
+        {
+            Snackbar.Add("Wystąpił błąd podczas generowania fiszek", Severity.Error);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task EditFlashcard(GeneratedFlashcard flashcard)
+    {
+        var parameters = new DialogParameters
+        {
+            ["Flashcard"] = flashcard
+        };
+
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+        var dialog = DialogService.Show<FlashcardEditDialog>("Edytuj fiszkę", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            var editedFlashcard = (GeneratedFlashcard)result.Data;
+            var index = flashcards.IndexOf(flashcard);
+            flashcards[index] = editedFlashcard;
+            Snackbar.Add("Fiszka została zaktualizowana", Severity.Success);
+        }
+    }
+
+    private void DeleteFlashcard(GeneratedFlashcard flashcard)
+    {
+        flashcards.Remove(flashcard);
+        Snackbar.Add("Fiszka została usunięta", Severity.Success);
+    }
+
+    private async Task SaveFlashcards()
+    {
+        try
+        {
+            // TODO: Implement save logic
+            await Task.Delay(1000); // Simulate API call
+            Snackbar.Add("Fiszki zostały zapisane", Severity.Success);
+        }
+        catch
+        {
+            Snackbar.Add("Wystąpił błąd podczas zapisywania fiszek", Severity.Error);
+        }
+    }
+} 

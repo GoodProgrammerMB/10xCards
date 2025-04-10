@@ -1,0 +1,31 @@
+﻿# Ignorowanie plików logów
+*.log
+
+# Ignorowanie folderów kompilacyjnych (bin/ i obj/) w dowolnej lokalizacji
+**/bin/
+**/obj/
+
+# Ignorowanie folderu Visual Studio
+.vs/
+
+# Ignorowanie plików konfiguracyjnych użytkownika Visual Studio
+*.suo
+*.user
+*.userosscache
+*.userprefs
+*.sln.docstates
+
+# Ignorowanie wyników testów (np. katalog TestResults generowany przez Visual Studio)
+[Tt]est[Rr]esult*/
+
+# Ignorowanie logów z procesu kompilacji
+[Bb]uild[Ll]og.*
+
+# Ignorowanie folderów NuGet Packages (jeśli korzystasz z mechanizmu restore, a paczki nie są wersjonowane)
+**/packages/
+
+# Opcjonalnie: Ignorowanie ustawień edytora Visual Studio Code, jeżeli są obecne
+.vscode/
+
+# Opcjonalnie: Ignorowanie plików i folderów generowanych przez narzędzia typu ReSharper
+_ReSharper*/

@@ -1,0 +1,136 @@
+@page "/moje-fiszki"
+@using FlashCard.App.Models
+@using FlashCard.App.Services
+@using Microsoft.AspNetCore.Authorization
+@inject IFlashcardService FlashcardService
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@attribute [Authorize]
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <MudText Typo="Typo.h4" Class="mb-4">Moje fiszki</MudText>
+
+    @if (isLoading)
+    {
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-4" />
+    }
+    else if (flashcards == null || !flashcards.Any())
+    {
+        <MudAlert Severity="Severity.Info">
+            Nie masz jeszcze żadnych fiszek. Możesz je wygenerować w zakładce "Generowanie fiszek".
+        </MudAlert>
+    }
+    else
+    {
+        <MudGrid>
+            @foreach (var flashcard in flashcards)
+            {
+                <MudItem xs="12" sm="6" md="4">
+                    <MudCard>
+                        <MudCardContent>
+                            <MudText Typo="Typo.subtitle1">Przód</MudText>
+                            <MudText Class="mb-4">@flashcard.Front</MudText>
+                            
+                            <MudDivider Class="my-2"/>
+                            
+                            <MudText Typo="Typo.subtitle1" Class="mt-2 mb-2">Tył</MudText>
+                            <MudText>@flashcard.Back</MudText>
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton StartIcon="@Icons.Material.Filled.Edit"
+                                     Color="Color.Primary"
+                                     OnClick="@(() => EditFlashcard(flashcard))">
+                                Edytuj
+                            </MudButton>
+                            <MudButton StartIcon="@Icons.Material.Filled.Delete"
+                                     Color="Color.Error"
+                                     OnClick="@(() => DeleteFlashcard(flashcard))">
+                                Usuń
+                            </MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            }
+        </MudGrid>
+    }
+</MudContainer>
+
+@code {
+    private bool isLoading = true;
+    private List<Flashcard> flashcards = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadFlashcards();
+    }
+
+    private async Task LoadFlashcards()
+    {
+        try
+        {
+            isLoading = true;
+            flashcards = await FlashcardService.GetUserFlashcardsAsync();
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Wystąpił błąd podczas ładowania fiszek", Severity.Error);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task EditFlashcard(Flashcard flashcard)
+    {
+        var parameters = new DialogParameters
+        {
+            ["Flashcard"] = flashcard
+        };
+
+        var dialog = await DialogService.ShowAsync<FlashcardEditDialog>("Edytuj fiszkę", parameters);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            try
+            {
+                var editedFlashcard = (Flashcard)result.Data;
+                await FlashcardService.UpdateFlashcardAsync(flashcard.Id, editedFlashcard);
+                await LoadFlashcards();
+                Snackbar.Add("Fiszka została zaktualizowana", Severity.Success);
+            }
+            catch (Exception)
+            {
+                Snackbar.Add("Wystąpił błąd podczas aktualizacji fiszki", Severity.Error);
+            }
+        }
+    }
+
+    private async Task DeleteFlashcard(Flashcard flashcard)
+    {
+        var parameters = new DialogParameters
+        {
+            ["ContentText"] = "Czy na pewno chcesz usunąć tę fiszkę?",
+            ["ButtonText"] = "Usuń",
+            ["Color"] = Color.Error
+        };
+
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>("Potwierdź usunięcie", parameters);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            try
+            {
+                await FlashcardService.DeleteFlashcardAsync(flashcard.Id);
+                await LoadFlashcards();
+                Snackbar.Add("Fiszka została usunięta", Severity.Success);
+            }
+            catch (Exception)
+            {
+                Snackbar.Add("Wystąpił błąd podczas usuwania fiszki", Severity.Error);
+            }
+        }
+    }
+} 

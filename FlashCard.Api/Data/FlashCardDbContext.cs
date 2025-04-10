@@ -19,31 +19,54 @@ public class FlashCardDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Configure User
-        modelBuilder.Entity<User>()
-            .HasIndex(u => u.Email)
-            .IsUnique();
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasIndex(e => e.Email).IsUnique();
+            entity.Property(e => e.Username).HasMaxLength(255);
+            entity.Property(e => e.Email).HasMaxLength(255);
+            entity.Property(e => e.PasswordHash).HasMaxLength(255);
+        });
 
-        // Configure Flashcard
-        modelBuilder.Entity<Flashcard>()
-            .HasIndex(f => f.UserId);
+        modelBuilder.Entity<Flashcard>(entity =>
+        {
+            entity.Property(e => e.Front).HasMaxLength(200);
+            entity.Property(e => e.Back).HasMaxLength(500);
+            entity.Property(e => e.Source).HasMaxLength(20);
 
-        modelBuilder.Entity<Flashcard>()
-            .HasIndex(f => f.Source);
+            entity.HasOne(f => f.User)
+                .WithMany(u => u.Flashcards)
+                .HasForeignKey(f => f.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<Flashcard>()
-            .Property(f => f.Source)
-            .HasConversion<string>()
-            .HasMaxLength(20)
-            .IsRequired();
+            entity.HasOne(f => f.Generation)
+                .WithMany(g => g.Flashcards)
+                .HasForeignKey(f => f.GenerationId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
 
-        // Configure Generation
-        modelBuilder.Entity<Generation>()
-            .HasIndex(g => g.UserId);
+        modelBuilder.Entity<Generation>(entity =>
+        {
+            entity.Property(e => e.Model).HasMaxLength(255);
+            entity.Property(e => e.SourceTextHash).HasMaxLength(255);
 
-        // Configure GenerationErrorLog
-        modelBuilder.Entity<GenerationErrorLog>()
-            .HasIndex(g => g.UserId);
+            entity.HasOne(g => g.User)
+                .WithMany(u => u.Generations)
+                .HasForeignKey(g => g.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<GenerationErrorLog>(entity =>
+        {
+            entity.Property(e => e.Model).HasMaxLength(255);
+            entity.Property(e => e.ErrorCode).HasMaxLength(50);
+            entity.Property(e => e.ErrorMessage).HasMaxLength(500);
+            entity.Property(e => e.SourceTextHash).HasMaxLength(255);
+
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.GenerationErrorLogs)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

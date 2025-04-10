@@ -7,11 +7,14 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -47,6 +50,21 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// Configure CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowBlazorApp",
+        builder => builder
+            .WithOrigins(
+                "https://localhost:7174",
+                "http://localhost:5007",
+                "http://localhost:5170"
+            )
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials());
+});
+
 // Configure DbContext
 builder.Services.AddDbContext<FlashCardDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -57,12 +75,30 @@ builder.Services.Configure<OpenRouterOptions>(
 builder.Services.AddSingleton<IValidateOptions<OpenRouterOptions>, OpenRouterOptionsValidator>();
 
 // Configure Authentication
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer();
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+});
 
 builder.Services.AddAuthorization();
 
 // Configure Services
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddHttpClient<IGenerationService, GenerationService>();
 builder.Services.AddScoped<IGenerationService, GenerationService>();
 
@@ -87,43 +123,27 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowBlazorApp");
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Ensure database is created
+app.MapControllers();
+
+// Ensure database is created and migrated
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<FlashCardDbContext>();
-        context.Database.EnsureCreated();
+        context.Database.Migrate();
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while creating the database.");
+        logger.LogError(ex, "An error occurred while migrating the database.");
     }
 }
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
 
 // Add endpoints
 app.MapPost("/generations", async (
@@ -139,12 +159,52 @@ app.MapPost("/generations", async (
     return Results.Created($"/generations/{result.Id}", result);
 })
 .RequireAuthorization()
-.WithName("GenerateFlashcards")
-.WithOpenApi();
+.WithName("GenerateFlashcards");
+
+// Add flashcards batch endpoint
+app.MapPost("/flashcards/batch", async (
+    BatchSaveRequest request,
+    FlashCardDbContext dbContext,
+    ClaimsPrincipal user,
+    CancellationToken cancellationToken) =>
+{
+    var userId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? 
+        throw new UnauthorizedAccessException("User not authenticated"));
+
+    var flashcards = request.Flashcards.Select(f => new Flashcard
+    {
+        UserId = userId,
+        Front = f.Front,
+        Back = f.Back,
+        GenerationId = f.GenerationId ?? throw new ArgumentNullException(nameof(f.GenerationId)),
+        CreatedAt = DateTime.UtcNow,
+        UpdatedAt = DateTime.UtcNow
+    }).ToList();
+
+    await dbContext.Flashcards.AddRangeAsync(flashcards, cancellationToken);
+    await dbContext.SaveChangesAsync(cancellationToken);
+
+    var response = new BatchSaveResponse
+    {
+        Data = flashcards.Select(f => new SavedFlashcard
+        {
+            Id = f.Id,
+            Front = f.Front,
+            Back = f.Back,
+            GenerationId = f.GenerationId,
+            CreatedAt = f.CreatedAt,
+            UpdatedAt = f.UpdatedAt
+        }).ToList(),
+        Summary = new BatchSaveSummary
+        {
+            TotalCreated = flashcards.Count,
+            TotalFailed = 0
+        }
+    };
+
+    return Results.Created("/flashcards/batch", response);
+})
+.RequireAuthorization()
+.WithName("SaveFlashcardsBatch");
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

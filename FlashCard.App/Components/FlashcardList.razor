@@ -1,0 +1,51 @@
+@using FlashCard.App.Models
+@using MudBlazor
+
+<MudPaper Class="pa-4 mt-4">
+    <MudText Typo="Typo.h5" Class="mb-4">Wygenerowane fiszki</MudText>
+
+    @if (Flashcards == null || !Flashcards.Any())
+    {
+        <MudText>Brak wygenerowanych fiszek.</MudText>
+    }
+    else
+    {
+        <MudGrid>
+            @foreach (var flashcard in Flashcards)
+            {
+                <MudItem xs="12" sm="6" md="4">
+                    <FlashcardItem Flashcard="@flashcard"
+                                 OnAccept="@(() => OnAcceptFlashcard.InvokeAsync(flashcard))"
+                                 OnEdit="@(() => OnEditFlashcard.InvokeAsync(flashcard))"
+                                 OnReject="@(() => OnRejectFlashcard.InvokeAsync(flashcard))" />
+                </MudItem>
+            }
+        </MudGrid>
+
+        <MudDivider Class="my-4" />
+
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Success"
+                   OnClick="@(() => OnSaveAccepted.InvokeAsync())"
+                   Disabled="@(!Flashcards.Any(f => f.Accepted == true))">
+            Zapisz zatwierdzone fiszki
+        </MudButton>
+    }
+</MudPaper>
+
+@code {
+    [Parameter]
+    public List<FlashcardViewModel> Flashcards { get; set; }
+
+    [Parameter]
+    public EventCallback<FlashcardViewModel> OnAcceptFlashcard { get; set; }
+
+    [Parameter]
+    public EventCallback<FlashcardViewModel> OnEditFlashcard { get; set; }
+
+    [Parameter]
+    public EventCallback<FlashcardViewModel> OnRejectFlashcard { get; set; }
+
+    [Parameter]
+    public EventCallback OnSaveAccepted { get; set; }
+} 

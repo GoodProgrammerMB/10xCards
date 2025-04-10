@@ -1,7 +1,7 @@
 Frontend
 Blazor Server – wykorzystaj interaktywny model renderowania, w którym logika aplikacji działa po stronie serwera, co umożliwia szybkie i responsywne interakcje z użytkownikiem.
 
-MudBlazor – dodaj tę bibliotekę komponentów inspirowanych Material Design, aby szybko budować nowoczesne i estetyczne interfejsy użytkownika. Instalacja pakietu NuGet w projekcie klienta oraz dodanie przestrzeni nazw w pliku _imports.razor zapewni dostęp do gotowych komponentów, takich jak przyciski, tabele czy karty.
+MudBlazor Server – dodaj tę bibliotekę komponentów inspirowanych Material Design, aby szybko budować nowoczesne i estetyczne interfejsy użytkownika. Instalacja pakietu NuGet w projekcie klienta oraz dodanie przestrzeni nazw w pliku _imports.razor zapewni dostęp do gotowych komponentów, takich jak przyciski, tabele czy karty.
 
 Backend i Baza Danych
 ASP.NET Core – wykorzystaj ten framework do budowy API oraz logiki biznesowej, co umożliwi skalowalną i bezpieczną obsługę po stronie serwera.

@@ -1,0 +1,89 @@
+@using FlashCard.App.Models
+@using MudBlazor
+
+<MudPaper Class="pa-4">
+    <MudText Typo="Typo.h5" Class="mb-4">Dodaj własną fiszkę</MudText>
+
+    <MudForm @ref="form" @bind-IsValid="@isValid">
+        <MudTextField T="string"
+                     @bind-Value="newFlashcard.Front"
+                     Label="Przód fiszki"
+                     Variant="Variant.Outlined"
+                     Lines="3"
+                     Counter="200"
+                     MaxLength="200"
+                     Immediate="true"
+                     Validation="@(new Func<string, IEnumerable<string>>(ValidateFront))"
+                     Class="mb-4" />
+        
+        <MudTextField T="string"
+                     @bind-Value="newFlashcard.Back"
+                     Label="Tył fiszki"
+                     Variant="Variant.Outlined"
+                     Lines="5"
+                     Counter="500"
+                     MaxLength="500"
+                     Immediate="true"
+                     Validation="@(new Func<string, IEnumerable<string>>(ValidateBack))"
+                     Class="mb-4" />
+
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   OnClick="HandleSubmit"
+                   Disabled="@(!isValid)">
+            Dodaj fiszkę
+        </MudButton>
+    </MudForm>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public EventCallback<FlashcardDTO> OnCreate { get; set; }
+
+    private MudForm form;
+    private bool isValid;
+    private FlashcardViewModel newFlashcard = new();
+
+    private IEnumerable<string> ValidateFront(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            yield return "Przód fiszki jest wymagany";
+        }
+        else if (text.Length > 200)
+        {
+            yield return "Przód fiszki nie może przekraczać 200 znaków";
+        }
+    }
+
+    private IEnumerable<string> ValidateBack(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            yield return "Tył fiszki jest wymagany";
+        }
+        else if (text.Length > 500)
+        {
+            yield return "Tył fiszki nie może przekraczać 500 znaków";
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (isValid)
+        {
+            var flashcard = new FlashcardDTO
+            {
+                Front = newFlashcard.Front,
+                Back = newFlashcard.Back,
+                Source = "manual"
+            };
+
+            await OnCreate.InvokeAsync(flashcard);
+
+            // Reset form
+            newFlashcard = new FlashcardViewModel();
+            await form.ResetAsync();
+        }
+    }
+} 

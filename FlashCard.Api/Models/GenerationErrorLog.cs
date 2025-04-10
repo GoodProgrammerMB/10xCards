@@ -13,6 +13,10 @@ public class GenerationErrorLog
     
     [Required]
     [MaxLength(50)]
+    public string ErrorCode { get; set; } = string.Empty;
+    
+    [Required]
+    [MaxLength(50)]
     public string Model { get; set; } = string.Empty;
     
     [Required]

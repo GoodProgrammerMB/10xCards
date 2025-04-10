@@ -3,16 +3,118 @@
   "WorkspaceRootPath": "D:\\Kurs_IA\\10xCards\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{015F4B72-829B-4EDA-B6E1-0FFE3E10F9B1}|FlashCard.Api\\FlashCard.Api.csproj|d:\\kurs_ia\\10xcards\\flashcard.api\\controllers\\userscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{015F4B72-829B-4EDA-B6E1-0FFE3E10F9B1}|FlashCard.Api\\FlashCard.Api.csproj|solutionrelative:flashcard.api\\controllers\\userscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|d:\\kurs_ia\\10xcards\\flashcard.app\\components\\pages\\login.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|solutionrelative:flashcard.app\\components\\pages\\login.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{015F4B72-829B-4EDA-B6E1-0FFE3E10F9B1}|FlashCard.Api\\FlashCard.Api.csproj|d:\\kurs_ia\\10xcards\\flashcard.api\\controllers\\flashcardscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{015F4B72-829B-4EDA-B6E1-0FFE3E10F9B1}|FlashCard.Api\\FlashCard.Api.csproj|solutionrelative:flashcard.api\\controllers\\flashcardscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{015F4B72-829B-4EDA-B6E1-0FFE3E10F9B1}|FlashCard.Api\\FlashCard.Api.csproj|d:\\kurs_ia\\10xcards\\flashcard.api\\models\\generationmodels.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{015F4B72-829B-4EDA-B6E1-0FFE3E10F9B1}|FlashCard.Api\\FlashCard.Api.csproj|solutionrelative:flashcard.api\\models\\generationmodels.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|d:\\kurs_ia\\10xcards\\flashcard.app\\components\\pages\\register.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|solutionrelative:flashcard.app\\components\\pages\\register.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|d:\\kurs_ia\\10xcards\\flashcard.app\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|solutionrelative:flashcard.app\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|d:\\kurs_ia\\10xcards\\flashcard.app\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|solutionrelative:flashcard.app\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|d:\\kurs_ia\\10xcards\\flashcard.app\\app.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|solutionrelative:flashcard.app\\app.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|d:\\kurs_ia\\10xcards\\flashcard.app\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|solutionrelative:flashcard.app\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|d:\\kurs_ia\\10xcards\\flashcard.app\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|solutionrelative:flashcard.app\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\marci\\AppData\\Local\\Temp\\.vsdbgsrc\\0e599f47268ea62b9af937dc43e1103c8accf8988ef11d1cec2bae5c647caaf7\\TaskAwaiter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|d:\\kurs_ia\\10xcards\\flashcard.app\\pages\\_host.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|solutionrelative:flashcard.app\\pages\\_host.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{015F4B72-829B-4EDA-B6E1-0FFE3E10F9B1}|FlashCard.Api\\FlashCard.Api.csproj|d:\\kurs_ia\\10xcards\\flashcard.api\\services\\openrouter\\openrouterservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{015F4B72-829B-4EDA-B6E1-0FFE3E10F9B1}|FlashCard.Api\\FlashCard.Api.csproj|solutionrelative:flashcard.api\\services\\openrouter\\openrouterservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|d:\\kurs_ia\\10xcards\\flashcard.app\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|solutionrelative:flashcard.app\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{015F4B72-829B-4EDA-B6E1-0FFE3E10F9B1}|FlashCard.Api\\FlashCard.Api.csproj|d:\\kurs_ia\\10xcards\\flashcard.api\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{015F4B72-829B-4EDA-B6E1-0FFE3E10F9B1}|FlashCard.Api\\FlashCard.Api.csproj|solutionrelative:flashcard.api\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|d:\\kurs_ia\\10xcards\\flashcard.app\\services\\apiauthenticationstateprovider.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|solutionrelative:flashcard.app\\services\\apiauthenticationstateprovider.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|d:\\kurs_ia\\10xcards\\flashcard.app\\components\\flashcardeditdialog.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|solutionrelative:flashcard.app\\components\\flashcardeditdialog.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|d:\\kurs_ia\\10xcards\\flashcard.app\\components\\pages\\error.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|solutionrelative:flashcard.app\\components\\pages\\error.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|d:\\kurs_ia\\10xcards\\flashcard.app\\services\\localstorageservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|solutionrelative:flashcard.app\\services\\localstorageservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{015F4B72-829B-4EDA-B6E1-0FFE3E10F9B1}|FlashCard.Api\\FlashCard.Api.csproj|d:\\kurs_ia\\10xcards\\flashcard.api\\tests\\generationservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{015F4B72-829B-4EDA-B6E1-0FFE3E10F9B1}|FlashCard.Api\\FlashCard.Api.csproj|solutionrelative:flashcard.api\\tests\\generationservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{015F4B72-829B-4EDA-B6E1-0FFE3E10F9B1}|FlashCard.Api\\FlashCard.Api.csproj|d:\\kurs_ia\\10xcards\\flashcard.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{015F4B72-829B-4EDA-B6E1-0FFE3E10F9B1}|FlashCard.Api\\FlashCard.Api.csproj|solutionrelative:flashcard.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|d:\\kurs_ia\\10xcards\\flashcard.app\\_imports.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|solutionrelative:flashcard.app\\_imports.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|d:\\kurs_ia\\10xcards\\flashcard.app\\layout\\mainlayout.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|solutionrelative:flashcard.app\\layout\\mainlayout.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|d:\\kurs_ia\\10xcards\\flashcard.app\\components\\routes.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|solutionrelative:flashcard.app\\components\\routes.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|d:\\kurs_ia\\10xcards\\flashcard.app\\layout\\navmenu.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|solutionrelative:flashcard.app\\layout\\navmenu.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|d:\\kurs_ia\\10xcards\\flashcard.app\\components\\flashcarditem.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2DB3C2D0-AC95-E4B4-7A23-6CD04E8889D8}|FlashCard.App\\FlashCard.App.csproj|solutionrelative:flashcard.app\\components\\flashcarditem.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{015F4B72-829B-4EDA-B6E1-0FFE3E10F9B1}|FlashCard.Api\\FlashCard.Api.csproj|d:\\kurs_ia\\10xcards\\flashcard.api\\configuration\\openrouteroptions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{015F4B72-829B-4EDA-B6E1-0FFE3E10F9B1}|FlashCard.Api\\FlashCard.Api.csproj|solutionrelative:flashcard.api\\configuration\\openrouteroptions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{015F4B72-829B-4EDA-B6E1-0FFE3E10F9B1}|FlashCard.Api\\FlashCard.Api.csproj|d:\\kurs_ia\\10xcards\\flashcard.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{015F4B72-829B-4EDA-B6E1-0FFE3E10F9B1}|FlashCard.Api\\FlashCard.Api.csproj|solutionrelative:flashcard.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{015F4B72-829B-4EDA-B6E1-0FFE3E10F9B1}|FlashCard.Api\\FlashCard.Api.csproj|d:\\kurs_ia\\10xcards\\flashcard.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{015F4B72-829B-4EDA-B6E1-0FFE3E10F9B1}|FlashCard.Api\\FlashCard.Api.csproj|solutionrelative:flashcard.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{015F4B72-829B-4EDA-B6E1-0FFE3E10F9B1}|FlashCard.Api\\FlashCard.Api.csproj|d:\\kurs_ia\\10xcards\\flashcard.api\\flashcard.api.http||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}",
@@ -26,7 +128,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 12,
           "Children": [
             {
               "$type": "Bookmark",
@@ -42,20 +144,345 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "FlashcardsController.cs",
+              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.Api\\Controllers\\FlashcardsController.cs",
+              "RelativeDocumentMoniker": "FlashCard.Api\\Controllers\\FlashcardsController.cs",
+              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.Api\\Controllers\\FlashcardsController.cs",
+              "RelativeToolTip": "FlashCard.Api\\Controllers\\FlashcardsController.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAMwBwAAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-10T20:20:35.34Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "launchSettings.json",
+              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.Api\\Properties\\launchSettings.json",
+              "RelativeDocumentMoniker": "FlashCard.Api\\Properties\\launchSettings.json",
+              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.Api\\Properties\\launchSettings.json",
+              "RelativeToolTip": "FlashCard.Api\\Properties\\launchSettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-04-10T19:24:37.651Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "launchSettings.json",
+              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Properties\\launchSettings.json",
+              "RelativeDocumentMoniker": "FlashCard.App\\Properties\\launchSettings.json",
+              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Properties\\launchSettings.json",
+              "RelativeToolTip": "FlashCard.App\\Properties\\launchSettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-04-10T19:24:29.321Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "ApiAuthenticationStateProvider.cs",
+              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Services\\ApiAuthenticationStateProvider.cs",
+              "RelativeDocumentMoniker": "FlashCard.App\\Services\\ApiAuthenticationStateProvider.cs",
+              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Services\\ApiAuthenticationStateProvider.cs",
+              "RelativeToolTip": "FlashCard.App\\Services\\ApiAuthenticationStateProvider.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-10T19:18:44.66Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\appsettings.json",
+              "RelativeDocumentMoniker": "FlashCard.App\\appsettings.json",
+              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\appsettings.json",
+              "RelativeToolTip": "FlashCard.App\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-04-10T19:18:26.927Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "AuthService.cs",
+              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Services\\AuthService.cs",
+              "RelativeDocumentMoniker": "FlashCard.App\\Services\\AuthService.cs",
+              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Services\\AuthService.cs",
+              "RelativeToolTip": "FlashCard.App\\Services\\AuthService.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAuwCMAAABOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-10T19:13:57.807Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "App.razor",
+              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\App.razor",
+              "RelativeDocumentMoniker": "FlashCard.App\\App.razor",
+              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\App.razor",
+              "RelativeToolTip": "FlashCard.App\\App.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-10T17:27:23.897Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Program.cs",
+              "RelativeDocumentMoniker": "FlashCard.App\\Program.cs",
+              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Program.cs",
+              "RelativeToolTip": "FlashCard.App\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACkAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-10T17:20:29.371Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Login.razor",
+              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Components\\Pages\\Login.razor",
+              "RelativeDocumentMoniker": "FlashCard.App\\Components\\Pages\\Login.razor",
+              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Components\\Pages\\Login.razor",
+              "RelativeToolTip": "FlashCard.App\\Components\\Pages\\Login.razor",
+              "ViewState": "AgIAADkAAAAAAAAAAAAcwFEAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-10T18:39:30.789Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "UsersController.cs",
+              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.Api\\Controllers\\UsersController.cs",
+              "RelativeDocumentMoniker": "FlashCard.Api\\Controllers\\UsersController.cs",
+              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.Api\\Controllers\\UsersController.cs",
+              "RelativeToolTip": "FlashCard.Api\\Controllers\\UsersController.cs",
+              "ViewState": "AgIAAA4AAAAAAAAAAAAgwCYAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-10T19:08:26.486Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "GenerationModels.cs",
+              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.Api\\Models\\GenerationModels.cs",
+              "RelativeDocumentMoniker": "FlashCard.Api\\Models\\GenerationModels.cs",
+              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.Api\\Models\\GenerationModels.cs",
+              "RelativeToolTip": "FlashCard.Api\\Models\\GenerationModels.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAowBsAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-10T20:20:41.35Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Register.razor",
+              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Components\\Pages\\Register.razor",
+              "RelativeDocumentMoniker": "FlashCard.App\\Components\\Pages\\Register.razor",
+              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Components\\Pages\\Register.razor",
+              "RelativeToolTip": "FlashCard.App\\Components\\Pages\\Register.razor",
+              "ViewState": "AgIAAFMAAAAAAAAAAAAvwGwAAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-10T19:11:54.311Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "_Host.cshtml",
+              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Pages\\_Host.cshtml",
+              "RelativeDocumentMoniker": "FlashCard.App\\Pages\\_Host.cshtml",
+              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Pages\\_Host.cshtml",
+              "RelativeToolTip": "FlashCard.App\\Pages\\_Host.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-10T19:50:19.552Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "TaskAwaiter.cs",
+              "DocumentMoniker": "C:\\Users\\marci\\AppData\\Local\\Temp\\.vsdbgsrc\\0e599f47268ea62b9af937dc43e1103c8accf8988ef11d1cec2bae5c647caaf7\\TaskAwaiter.cs",
+              "ToolTip": "C:\\Users\\marci\\AppData\\Local\\Temp\\.vsdbgsrc\\0e599f47268ea62b9af937dc43e1103c8accf8988ef11d1cec2bae5c647caaf7\\TaskAwaiter.cs [Read Only]",
+              "ViewState": "AgIAAHMAAAAAAAAAAAAgwI8AAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-10T20:01:09.88Z",
+              "EditorCaption": " [Read Only]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "appsettings.Development.json",
+              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\appsettings.Development.json",
+              "RelativeDocumentMoniker": "FlashCard.App\\appsettings.Development.json",
+              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\appsettings.Development.json",
+              "RelativeToolTip": "FlashCard.App\\appsettings.Development.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-04-10T20:03:00.164Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Microsoft.Common.CurrentVersion.targets",
+              "DocumentMoniker": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
+              "ToolTip": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
+              "ViewState": "AgIAANkUAAAAAAAAAAAhwPMUAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003801|",
+              "WhenOpened": "2025-04-10T19:54:15.436Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "OpenRouterService.cs",
+              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.Api\\Services\\OpenRouter\\OpenRouterService.cs",
+              "RelativeDocumentMoniker": "FlashCard.Api\\Services\\OpenRouter\\OpenRouterService.cs",
+              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.Api\\Services\\OpenRouter\\OpenRouterService.cs",
+              "RelativeToolTip": "FlashCard.Api\\Services\\OpenRouter\\OpenRouterService.cs",
+              "ViewState": "AgIAAJ0AAAAAAAAAAAAMwLYAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-10T19:25:26.478Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "Error.razor",
+              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Components\\Pages\\Error.razor",
+              "RelativeDocumentMoniker": "FlashCard.App\\Components\\Pages\\Error.razor",
+              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Components\\Pages\\Error.razor",
+              "RelativeToolTip": "FlashCard.App\\Components\\Pages\\Error.razor",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAABsAAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-10T17:57:42.744Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "LocalStorageService.cs",
+              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Services\\LocalStorageService.cs",
+              "RelativeDocumentMoniker": "FlashCard.App\\Services\\LocalStorageService.cs",
+              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Services\\LocalStorageService.cs",
+              "RelativeToolTip": "FlashCard.App\\Services\\LocalStorageService.cs",
+              "ViewState": "AgIAABoAAAAAAAAAAAAjwCgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-10T17:57:01.271Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "GenerationServiceTests.cs",
+              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.Api\\Tests\\GenerationServiceTests.cs",
+              "RelativeDocumentMoniker": "FlashCard.Api\\Tests\\GenerationServiceTests.cs",
+              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.Api\\Tests\\GenerationServiceTests.cs",
+              "RelativeToolTip": "FlashCard.Api\\Tests\\GenerationServiceTests.cs",
+              "ViewState": "AgIAACMAAAAAAAAAAAA+wDgAAAAzAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-10T17:55:22.108Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "Routes.razor",
+              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Components\\Routes.razor",
+              "RelativeDocumentMoniker": "FlashCard.App\\Components\\Routes.razor",
+              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Components\\Routes.razor",
+              "RelativeToolTip": "FlashCard.App\\Components\\Routes.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-10T17:28:47.449Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "MainLayout.razor",
+              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Layout\\MainLayout.razor",
+              "RelativeDocumentMoniker": "FlashCard.App\\Layout\\MainLayout.razor",
+              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Layout\\MainLayout.razor",
+              "RelativeToolTip": "FlashCard.App\\Layout\\MainLayout.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-10T17:28:41.043Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "_Imports.razor",
+              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\_Imports.razor",
+              "RelativeDocumentMoniker": "FlashCard.App\\_Imports.razor",
+              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\_Imports.razor",
+              "RelativeToolTip": "FlashCard.App\\_Imports.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-10T17:26:59.259Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "FlashcardEditDialog.razor",
+              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Components\\FlashcardEditDialog.razor",
+              "RelativeDocumentMoniker": "FlashCard.App\\Components\\FlashcardEditDialog.razor",
+              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Components\\FlashcardEditDialog.razor",
+              "RelativeToolTip": "FlashCard.App\\Components\\FlashcardEditDialog.razor",
+              "ViewState": "AgIAAAEAAAAAAAAAAAASwBIAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-10T17:04:28.348Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "NavMenu.razor",
+              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Layout\\NavMenu.razor",
+              "RelativeDocumentMoniker": "FlashCard.App\\Layout\\NavMenu.razor",
+              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Layout\\NavMenu.razor",
+              "RelativeToolTip": "FlashCard.App\\Layout\\NavMenu.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-10T17:00:49.479Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
               "Title": "OpenRouterOptions.cs",
               "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.Api\\Configuration\\OpenRouterOptions.cs",
               "RelativeDocumentMoniker": "FlashCard.Api\\Configuration\\OpenRouterOptions.cs",
               "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.Api\\Configuration\\OpenRouterOptions.cs",
               "RelativeToolTip": "FlashCard.Api\\Configuration\\OpenRouterOptions.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAzAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAACAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-09T21:22:46.862Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-09T21:22:46.862Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 21,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.Api\\Program.cs",
+              "RelativeDocumentMoniker": "FlashCard.Api\\Program.cs",
+              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.Api\\Program.cs",
+              "RelativeToolTip": "FlashCard.Api\\Program.cs",
+              "ViewState": "AgIAAGoAAAAAAAAAAAAgwGcAAABdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-09T21:21:27.266Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "FlashcardItem.razor",
+              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Components\\FlashcardItem.razor",
+              "RelativeDocumentMoniker": "FlashCard.App\\Components\\FlashcardItem.razor",
+              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.App\\Components\\FlashcardItem.razor",
+              "RelativeToolTip": "FlashCard.App\\Components\\FlashcardItem.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAABXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-10T17:02:14.054Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 28,
               "Title": "appsettings.json",
               "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.Api\\appsettings.json",
               "RelativeDocumentMoniker": "FlashCard.Api\\appsettings.json",
@@ -63,25 +490,11 @@
               "RelativeToolTip": "FlashCard.Api\\appsettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-04-09T21:22:38.739Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-09T21:22:38.739Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Program.cs",
-              "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.Api\\Program.cs",
-              "RelativeDocumentMoniker": "FlashCard.Api\\Program.cs",
-              "ToolTip": "D:\\Kurs_IA\\10xCards\\FlashCard.Api\\Program.cs",
-              "RelativeToolTip": "FlashCard.Api\\Program.cs",
-              "ViewState": "AgIAAC8AAAAAAAAAAAAgwEcAAABdAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-09T21:21:27.266Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 29,
               "Title": "FlashCard.Api.http",
               "DocumentMoniker": "D:\\Kurs_IA\\10xCards\\FlashCard.Api\\FlashCard.Api.http",
               "RelativeDocumentMoniker": "FlashCard.Api\\FlashCard.Api.http",
@@ -89,8 +502,7 @@
               "RelativeToolTip": "FlashCard.Api\\FlashCard.Api.http",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003502|",
-              "WhenOpened": "2025-04-09T21:21:24.685Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-09T21:21:24.685Z"
             }
           ]
         },

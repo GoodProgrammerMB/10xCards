@@ -17,7 +17,7 @@ namespace FlashCard.Api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.4")
+                .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -61,8 +61,6 @@ namespace FlashCard.Api.Migrations
 
                     b.HasIndex("GenerationId");
 
-                    b.HasIndex("Source");
-
                     b.HasIndex("UserId");
 
                     b.ToTable("Flashcards");
@@ -76,19 +74,10 @@ namespace FlashCard.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AcceptedEditedCount")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("AcceptedUneditedCount")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("GeneratedCount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("GenerationDuration")
                         .HasColumnType("int");
 
                     b.Property<string>("Model")
@@ -96,13 +85,14 @@ namespace FlashCard.Api.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("SourceTextHash")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
-
-                    b.Property<int>("SourceTextLength")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -133,10 +123,17 @@ namespace FlashCard.Api.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("ErrorDetails")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ErrorMessage")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("GenerationId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Model")
                         .IsRequired()
@@ -148,13 +145,12 @@ namespace FlashCard.Api.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int>("SourceTextLength")
-                        .HasColumnType("int");
-
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GenerationId");
 
                     b.HasIndex("UserId");
 
@@ -177,8 +173,18 @@ namespace FlashCard.Api.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
@@ -192,7 +198,8 @@ namespace FlashCard.Api.Migrations
                 {
                     b.HasOne("FlashCard.Api.Models.Generation", "Generation")
                         .WithMany("Flashcards")
-                        .HasForeignKey("GenerationId");
+                        .HasForeignKey("GenerationId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("FlashCard.Api.Models.User", "User")
                         .WithMany("Flashcards")
@@ -218,6 +225,10 @@ namespace FlashCard.Api.Migrations
 
             modelBuilder.Entity("FlashCard.Api.Models.GenerationErrorLog", b =>
                 {
+                    b.HasOne("FlashCard.Api.Models.Generation", null)
+                        .WithMany("GenerationErrorLogs")
+                        .HasForeignKey("GenerationId");
+
                     b.HasOne("FlashCard.Api.Models.User", "User")
                         .WithMany("GenerationErrorLogs")
                         .HasForeignKey("UserId")
@@ -230,6 +241,8 @@ namespace FlashCard.Api.Migrations
             modelBuilder.Entity("FlashCard.Api.Models.Generation", b =>
                 {
                     b.Navigation("Flashcards");
+
+                    b.Navigation("GenerationErrorLogs");
                 });
 
             modelBuilder.Entity("FlashCard.Api.Models.User", b =>

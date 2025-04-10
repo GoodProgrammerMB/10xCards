@@ -1,0 +1,65 @@
+@using FlashCard.App.Models
+@using MudBlazor
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">Edytuj fiszkę</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="form" @bind-IsValid="@isValid">
+            <MudTextField T="string"
+                         @bind-Value="editedFlashcard.Front"
+                         Label="Przód fiszki"
+                         Required="true"
+                         RequiredError="Przód fiszki jest wymagany"
+                         Lines="3"
+                         Class="mb-4" />
+
+            <MudTextField T="string"
+                         @bind-Value="editedFlashcard.Back"
+                         Label="Tył fiszki"
+                         Required="true"
+                         RequiredError="Tył fiszki jest wymagany"
+                         Lines="5"
+                         Class="mb-4" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Anuluj</MudButton>
+        <MudButton Color="Color.Primary" 
+                  OnClick="Submit" 
+                  Disabled="@(!isValid)">
+            Zapisz
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] 
+    MudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter] 
+    public Flashcard Flashcard { get; set; } = null!;
+
+    private MudForm form = null!;
+    private bool isValid;
+    private Flashcard editedFlashcard = new();
+
+    protected override void OnInitialized()
+    {
+        editedFlashcard = new Flashcard
+        {
+            Id = Flashcard.Id,
+            Front = Flashcard.Front,
+            Back = Flashcard.Back,
+            Source = Flashcard.Source
+        };
+    }
+
+    private void Submit()
+    {
+        MudDialog.Close(DialogResult.Ok(editedFlashcard));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+} 

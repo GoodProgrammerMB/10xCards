@@ -6,6 +6,10 @@ using FlashCard.Api.Data;
 using FlashCard.Api.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace FlashCard.Api.Services;
 
@@ -15,6 +19,7 @@ public class GenerationService : IGenerationService
     private readonly HttpClient _httpClient;
     private readonly FlashCardDbContext _dbContext;
     private readonly OpenRouterOptions _options;
+    private const string GenerationEndpoint = "/generations";
     
     public GenerationService(
         ILogger<GenerationService> logger,
@@ -32,93 +37,66 @@ public class GenerationService : IGenerationService
         _httpClient.Timeout = TimeSpan.FromSeconds(_options.TimeoutSeconds);
     }
 
-    public async Task<GenerationResponseDto> GenerateFlashcardsAsync(
-        GenerationRequestDto request,
-        int userId,
-        CancellationToken cancellationToken = default)
+    public async Task<GenerationResponseDto> GenerateFlashcardsAsync(GenerationRequestDto request, int userId, CancellationToken cancellationToken = default)
     {
         try
         {
-            var sourceTextHash = ComputeHash(request.SourceText);
-            var model = request.Model ?? _options.DefaultModel;
-            
-            // Przygotowanie zapytania do AI
-            var aiRequest = new
-            {
-                model = model,
-                messages = new[]
-                {
-                    new
-                    {
-                        role = "system",
-                        content = "Jesteś ekspertem w tworzeniu fiszek edukacyjnych. Twoim zadaniem jest analiza tekstu i utworzenie z niego wysokiej jakości fiszek w formacie JSON. Każda fiszka powinna zawierać pole 'front' z pytaniem lub pojęciem i pole 'back' z odpowiedzią lub definicją."
-                    },
-                    new
-                    {
-                        role = "user",
-                        content = $"Utwórz fiszki z poniższego tekstu:\n\n{request.SourceText}"
-                    }
-                }
-            };
-
-            // Wywołanie API
-            var response = await _httpClient.PostAsJsonAsync("/chat", aiRequest, cancellationToken);
+            var response = await _httpClient.PostAsJsonAsync(GenerationEndpoint, request, cancellationToken);
             response.EnsureSuccessStatusCode();
             
-            var aiResponse = await response.Content.ReadFromJsonAsync<OpenRouterResponse>(cancellationToken: cancellationToken);
-            var flashcardsJson = aiResponse?.Choices?[0]?.Message?.Content 
-                ?? throw new Exception("Invalid AI response format");
-            
-            var flashcards = JsonSerializer.Deserialize<List<GenerationFlashcardDto>>(flashcardsJson)
-                ?? throw new Exception("Could not parse flashcards from AI response");
-
-            // Zapis do bazy danych
             var generation = new Generation
             {
                 UserId = userId,
-                Model = model,
-                SourceTextHash = sourceTextHash,
-                GeneratedCount = flashcards.Count,
-                Flashcards = flashcards.Select(f => new Flashcard
-                {
-                    UserId = userId,
-                    Front = f.Front,
-                    Back = f.Back,
-                    Source = f.Source
-                }).ToList()
+                Model = request.Model ?? "default",
+                SourceTextHash = ComputeHash(request.SourceText),
+                GeneratedCount = 0,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
             };
-
-            _dbContext.Generations.Add(generation);
+            
+            await _dbContext.Generations.AddAsync(generation, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
-
-            // Przygotowanie odpowiedzi
+            
+            var openRouterResponse = await response.Content.ReadFromJsonAsync<OpenRouterResponse>(cancellationToken: cancellationToken);
+            var content = openRouterResponse?.Choices?.FirstOrDefault()?.Message?.Content;
+            
+            if (string.IsNullOrEmpty(content))
+            {
+                throw new Exception("Empty response from OpenRouter API");
+            }
+            
+            var flashcards = JsonSerializer.Deserialize<List<GenerationFlashcardDto>>(content);
+            if (flashcards == null || !flashcards.Any())
+            {
+                throw new Exception("Failed to parse flashcards from API response");
+            }
+            
+            generation.GeneratedCount = flashcards.Count;
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            
             return new GenerationResponseDto
             {
                 Id = generation.Id,
                 UserId = userId,
-                Model = model,
-                GeneratedCount = flashcards.Count,
+                Model = generation.Model,
+                GeneratedCount = generation.GeneratedCount,
                 Flashcards = flashcards,
                 CreatedAt = generation.CreatedAt
             };
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error during flashcard generation for user {UserId}", userId);
+            _logger.LogError(ex, "Error generating flashcards for user {UserId}", userId);
             
-            // Logowanie błędu do bazy
-            var errorLog = new GenerationErrorLog
+            await _dbContext.GenerationErrorLogs.AddAsync(new GenerationErrorLog
             {
                 UserId = userId,
-                Model = request.Model ?? _options.DefaultModel,
-                SourceTextHash = ComputeHash(request.SourceText),
+                ErrorCode = ex.GetType().Name,
                 ErrorMessage = ex.Message,
-                ErrorDetails = ex.ToString()
-            };
+                CreatedAt = DateTime.UtcNow
+            }, cancellationToken);
             
-            _dbContext.GenerationErrorLogs.Add(errorLog);
             await _dbContext.SaveChangesAsync(cancellationToken);
-            
             throw;
         }
     }
