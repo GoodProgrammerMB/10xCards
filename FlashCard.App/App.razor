@@ -8,14 +8,11 @@
         <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                 <NotAuthorized>
-                    @if (context.User.Identity?.IsAuthenticated != true)
-                    {
-                        <RedirectToLogin />
-                    }
-                    else
-                    {
-                        <MudAlert Severity="Severity.Error">Nie masz uprawnień do wyświetlenia tej strony.</MudAlert>
-                    }
+                    <MudLayout>
+                        <MudMainContent>
+                            <AuthTabs />
+                        </MudMainContent>
+                    </MudLayout>
                 </NotAuthorized>
             </AuthorizeRouteView>
             <FocusOnNavigate RouteData="@routeData" Selector="h1" />
@@ -23,7 +20,7 @@
         <NotFound>
             <PageTitle>Not found</PageTitle>
             <LayoutView Layout="@typeof(MainLayout)">
-                <p role="alert">Sorry, there's nothing at this address.</p>
+                <p role="alert">Przepraszamy, nie znaleziono strony pod tym adresem.</p>
             </LayoutView>
         </NotFound>
     </Router>
@@ -37,7 +34,7 @@
 
         protected override void OnInitialized()
         {
-            NavigationManager.NavigateTo("/login");
+            NavigationManager.NavigateTo("/login", forceLoad: true);
         }
     }
 } 

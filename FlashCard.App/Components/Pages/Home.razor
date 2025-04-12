@@ -1,7 +1,23 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Strona główna</PageTitle>
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <MudCard Outlined="true">
+        <MudCardHeader>
+            <MudText Typo="Typo.h4">Witaj w aplikacji do nauki z fiszkami!</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudText Typo="Typo.body1">
+                Wybierz jedną z opcji z menu, aby rozpocząć:
+            </MudText>
+            <MudList>
+                <MudListItem Icon="@Icons.Material.Filled.Add">Generowanie fiszek</MudListItem>
+                <MudListItem Icon="@Icons.Material.Filled.List">Moje fiszki</MudListItem>
+                <MudListItem Icon="@Icons.Material.Filled.School">Nauka</MudListItem>
+            </MudList>
+        </MudCardContent>
+    </MudCard>
+</MudContainer>

@@ -1,0 +1,209 @@
+@using FlashCard.App.Models
+@using FlashCard.App.Services
+@using System.ComponentModel.DataAnnotations
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ISnackbar Snackbar
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-center justify-center" Style="height: 100vh;">
+    <MudPaper Elevation="3" Class="pa-8" Style="width: 100%; max-width: 500px;">
+        <MudTabs Elevation="0" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pt-6">
+            <MudTabPanel Text="Logowanie">
+                <MudForm @ref="loginForm" @bind-IsValid="@isLoginValid">
+                    <MudTextField T="string"
+                                @bind-Value="loginModel.Email"
+                                Label="Email"
+                                Required="true"
+                                RequiredError="Email jest wymagany"
+                                Validation="@(new EmailAddressAttribute() {ErrorMessage = "Nieprawidłowy format adresu email"})"
+                                Class="mb-4" />
+
+                    <MudTextField T="string"
+                                @bind-Value="loginModel.Password"
+                                Label="Hasło"
+                                Required="true"
+                                RequiredError="Hasło jest wymagane"
+                                InputType="InputType.Password"
+                                Class="mb-4" />
+
+                    <MudCheckBox @bind-Checked="loginModel.RememberMe"
+                               T="bool"
+                               Label="Zapamiętaj mnie"
+                               Color="Color.Primary"
+                               Class="mb-4" />
+
+                    @if (!string.IsNullOrEmpty(loginError))
+                    {
+                        <MudAlert Severity="Severity.Error" Class="mb-4">@loginError</MudAlert>
+                    }
+
+                    <MudButton Variant="Variant.Filled"
+                             Color="Color.Primary"
+                             OnClick="HandleLogin"
+                             Disabled="@(!isLoginValid || isLoginLoading)"
+                             FullWidth="true"
+                             Size="Size.Large"
+                             Class="mb-4">
+                        @if (isLoginLoading)
+                        {
+                            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                            <MudText Class="ms-2">Logowanie...</MudText>
+                        }
+                        else
+                        {
+                            <MudText>Zaloguj się</MudText>
+                        }
+                    </MudButton>
+                </MudForm>
+            </MudTabPanel>
+            <MudTabPanel Text="Rejestracja">
+                <MudForm @ref="registerForm" @bind-IsValid="@isRegisterValid">
+                    <MudTextField T="string"
+                                @bind-Value="registerModel.Email"
+                                Label="Email"
+                                Required="true"
+                                RequiredError="Email jest wymagany"
+                                Validation="@(new EmailAddressAttribute() {ErrorMessage = "Nieprawidłowy format adresu email"})"
+                                Class="mb-4" />
+
+                    <MudTextField T="string"
+                                @bind-Value="registerModel.Password"
+                                Label="Hasło"
+                                Required="true"
+                                RequiredError="Hasło jest wymagane"
+                                InputType="InputType.Password"
+                                Validation="@(new Func<string, string>(ValidatePassword))"
+                                Class="mb-4" />
+
+                    <MudTextField T="string"
+                                @bind-Value="registerModel.ConfirmPassword"
+                                Label="Potwierdź hasło"
+                                Required="true"
+                                RequiredError="Potwierdzenie hasła jest wymagane"
+                                InputType="InputType.Password"
+                                Validation="@(new Func<string, string>(ValidateConfirmPassword))"
+                                Class="mb-4" />
+
+                    @if (!string.IsNullOrEmpty(registerError))
+                    {
+                        <MudAlert Severity="Severity.Error" Class="mb-4">@registerError</MudAlert>
+                    }
+
+                    <MudButton Variant="Variant.Filled"
+                             Color="Color.Primary"
+                             OnClick="HandleRegister"
+                             Disabled="@(!isRegisterValid || isRegisterLoading)"
+                             FullWidth="true"
+                             Size="Size.Large"
+                             Class="mb-4">
+                        @if (isRegisterLoading)
+                        {
+                            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                            <MudText Class="ms-2">Rejestracja...</MudText>
+                        }
+                        else
+                        {
+                            <MudText>Zarejestruj się</MudText>
+                        }
+                    </MudButton>
+                </MudForm>
+            </MudTabPanel>
+        </MudTabs>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    // Login
+    private MudForm loginForm;
+    private LoginModel loginModel = new();
+    private bool isLoginValid;
+    private bool isLoginLoading;
+    private string loginError;
+
+    // Register
+    private MudForm registerForm;
+    private RegisterModel registerModel = new();
+    private bool isRegisterValid;
+    private bool isRegisterLoading;
+    private string registerError;
+
+    private async Task HandleLogin()
+    {
+        if (!isLoginValid) return;
+
+        isLoginLoading = true;
+        loginError = null;
+
+        try
+        {
+            var result = await AuthService.LoginAsync(loginModel);
+            if (result.Successful)
+            {
+                ((ApiAuthenticationStateProvider)AuthStateProvider).NotifyUserAuthentication(result.Token!);
+                NavigationManager.NavigateTo("/");
+            }
+            else
+            {
+                loginError = result.Error;
+            }
+        }
+        catch (Exception ex)
+        {
+            loginError = $"Wystąpił błąd podczas logowania: {ex.Message}";
+        }
+        finally
+        {
+            isLoginLoading = false;
+        }
+    }
+
+    private string ValidatePassword(string password)
+    {
+        if (string.IsNullOrWhiteSpace(password))
+            return "Hasło jest wymagane";
+        if (password.Length < 6)
+            return "Hasło musi mieć co najmniej 6 znaków";
+        return null;
+    }
+
+    private string ValidateConfirmPassword(string confirmPassword)
+    {
+        if (string.IsNullOrWhiteSpace(confirmPassword))
+            return "Potwierdzenie hasła jest wymagane";
+        if (confirmPassword != registerModel.Password)
+            return "Hasła nie są identyczne";
+        return null;
+    }
+
+    private async Task HandleRegister()
+    {
+        if (!isRegisterValid) return;
+
+        isRegisterLoading = true;
+        registerError = null;
+
+        try
+        {
+            var result = await AuthService.RegisterAsync(registerModel);
+            if (result.Successful)
+            {
+                Snackbar.Add("Rejestracja zakończona pomyślnie. Możesz się teraz zalogować.", Severity.Success);
+                registerModel = new RegisterModel(); // Clear form
+                await registerForm.ResetAsync(); // Reset validation
+            }
+            else
+            {
+                registerError = result.Error;
+            }
+        }
+        catch (Exception ex)
+        {
+            registerError = "Wystąpił błąd podczas rejestracji. Spróbuj ponownie później.";
+        }
+        finally
+        {
+            isRegisterLoading = false;
+        }
+    }
+} 

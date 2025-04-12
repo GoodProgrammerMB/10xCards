@@ -1,0 +1,16 @@
+﻿@page "/nauka"
+@using FlashCard.App.Models
+@using FlashCard.App.Services
+@using Microsoft.AspNetCore.Authorization
+@inject IFlashcardService FlashcardService
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@attribute [Authorize]
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <MudText Typo="Typo.h4" Class="mb-4">Nauka</MudText>
+    </MudContainer>
+
+@code {
+
+}

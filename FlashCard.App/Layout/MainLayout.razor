@@ -1,55 +1,195 @@
 @inherits LayoutComponentBase
 @using Microsoft.AspNetCore.Components.Authorization
 @using FlashCard.App.Services
+@using FlashCard.App.Models
+@using System.ComponentModel.DataAnnotations
 @using MudBlazor
 @inject IAuthService AuthService
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
+@inject AuthenticationStateProvider AuthStateProvider
 
 <MudThemeProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<MudLayout>
-    <MudAppBar>
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
-        <MudText Typo="Typo.h6">10xCards</MudText>
-        <MudSpacer />
-        <AuthorizeView>
-            <Authorized>
-                <MudButton Color="Color.Inherit" OnClick="Logout">Wyloguj</MudButton>
-            </Authorized>
-            <NotAuthorized>
-                <MudButton Color="Color.Inherit" OnClick="@(() => NavigationManager.NavigateTo("login"))">Zaloguj</MudButton>
-            </NotAuthorized>
-        </AuthorizeView>
-    </MudAppBar>
+<AuthorizeView>
+    <Authorized>
+        <MudLayout>
+            <MudAppBar style="display: flex; align-items:end">
+                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
+                <div style="display: flex; gap: 5px; justify-content:center; align-items:center">
+                    <MudAvatar Color="Color.Inherit">@user.FirstOrDefault()</MudAvatar>
+                    <span><strong>@user</strong></span>
+                </div>
+                <MudSpacer />
+                <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" OnClick="Logout" />
+            </MudAppBar>
 
-    <MudDrawer @bind-Open="@drawerOpen">
-        <MudNavMenu>
-            <MudNavLink Href="/" Match="NavLinkMatch.All">Strona główna</MudNavLink>
-            <AuthorizeView>
-                <Authorized>
-                    <MudNavLink Href="/generowanie">Generowanie fiszek</MudNavLink>
-                    <MudNavLink Href="/moje-fiszki">Moje fiszki</MudNavLink>
-                </Authorized>
-            </AuthorizeView>
-        </MudNavMenu>
-    </MudDrawer>
+            <MudDrawer @bind-Open="@drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="1">
+                <NavMenu />
+            </MudDrawer>
 
-    <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.Large" Class="my-4">
-            @Body
-        </MudContainer>
-    </MudMainContent>
-</MudLayout>
+            <MudMainContent>
+                <MudContainer MaxWidth="MaxWidth.Large" Class="pa-6">
+                    @Body
+                </MudContainer>
+            </MudMainContent>
+        </MudLayout>
+    </Authorized>
+    <NotAuthorized>
+        @Body
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
     private bool drawerOpen = true;
+    private string user = "";
+
+    // Login
+    private MudForm loginForm;
+    private LoginModel loginModel = new();
+    private bool isLoginValid;
+    private bool isLoginLoading;
+    private string loginError;
+
+    // Register
+    private MudForm registerForm;
+    private RegisterModel registerModel = new();
+    private bool isRegisterValid;
+    private bool isRegisterLoading;
+    private string registerError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated ?? false)
+        {
+            user = authState.User.Identity.Name ?? "User";
+        }
+
+        AuthStateProvider.AuthenticationStateChanged += AuthenticationStateChangedHandler;
+    }
+
+    private async void AuthenticationStateChangedHandler(Task<AuthenticationState> task)
+    {
+        var authState = await task;
+        if (authState.User.Identity?.IsAuthenticated ?? false)
+        {
+            user = authState.User.Identity.Name ?? "User";
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        AuthStateProvider.AuthenticationStateChanged -= AuthenticationStateChangedHandler;
+    }
 
     private void ToggleDrawer()
     {
         drawerOpen = !drawerOpen;
+    }
+
+    private async Task HandleLogin()
+    {
+        if (!isLoginValid) return;
+
+        isLoginLoading = true;
+        loginError = null;
+
+        try
+        {
+            var result = await AuthService.LoginAsync(loginModel);
+            if (result.Successful)
+            {
+                await Task.Delay(100);
+                var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+                if (authState.User.Identity is not null)
+                {
+                    if (authState.User.Identity.IsAuthenticated)
+                    {
+                        NavigationManager.NavigateTo("/");
+                    }
+                    else
+                    {
+                        loginError = "Błąd uwierzytelniania - token został zapisany, ale użytkownik nie jest uwierzytelniony.";
+                        ((ApiAuthenticationStateProvider)AuthStateProvider).NotifyUserAuthentication(result.Token!);
+                        await Task.Delay(100);
+                        authState = await AuthStateProvider.GetAuthenticationStateAsync();
+                        if (authState.User.Identity.IsAuthenticated)
+                        {
+                            NavigationManager.NavigateTo("/");
+                        }
+                    }
+                }
+                else
+                {
+                    loginError = "Błąd uwierzytelniania - brak tożsamości użytkownika.";
+                }
+            }
+            else
+            {
+                loginError = result.Error;
+            }
+        }
+        catch (Exception ex)
+        {
+            loginError = $"Wystąpił błąd podczas logowania: {ex.Message}";
+        }
+        finally
+        {
+            isLoginLoading = false;
+        }
+    }
+
+    private string ValidatePassword(string password)
+    {
+        if (string.IsNullOrWhiteSpace(password))
+            return "Hasło jest wymagane";
+        if (password.Length < 6)
+            return "Hasło musi mieć co najmniej 6 znaków";
+        return null;
+    }
+
+    private string ValidateConfirmPassword(string confirmPassword)
+    {
+        if (string.IsNullOrWhiteSpace(confirmPassword))
+            return "Potwierdzenie hasła jest wymagane";
+        if (confirmPassword != registerModel.Password)
+            return "Hasła nie są identyczne";
+        return null;
+    }
+
+    private async Task HandleRegister()
+    {
+        if (!isRegisterValid) return;
+
+        isRegisterLoading = true;
+        registerError = null;
+
+        try
+        {
+            var result = await AuthService.RegisterAsync(registerModel);
+            if (result.Successful)
+            {
+                Snackbar.Add("Rejestracja zakończona pomyślnie. Możesz się teraz zalogować.", Severity.Success);
+                registerModel = new RegisterModel(); // Clear form
+                await registerForm.ResetAsync(); // Reset validation
+            }
+            else
+            {
+                registerError = result.Error;
+            }
+        }
+        catch (Exception ex)
+        {
+            registerError = "Wystąpił błąd podczas rejestracji. Spróbuj ponownie później.";
+        }
+        finally
+        {
+            isRegisterLoading = false;
+        }
     }
 
     private async Task Logout()

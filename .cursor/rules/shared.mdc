@@ -8,7 +8,7 @@ alwaysApply: false
 
 ## Tech Stack
 
-- Mud Blazor
+- Mud Blazor Sever
 - ASP.NET Core
 - Minimal API
 - ASP.NET Core Identity

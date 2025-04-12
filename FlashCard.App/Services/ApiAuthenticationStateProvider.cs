@@ -32,7 +32,8 @@ public class ApiAuthenticationStateProvider : AuthenticationStateProvider
                 }
 
                 var claims = ParseClaimsFromJwt(token);
-                var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "jwt"));
+                var identity = new ClaimsIdentity(claims, "Bearer", ClaimTypes.Name, ClaimTypes.Role);
+                var user = new ClaimsPrincipal(identity);
                 return new AuthenticationState(user);
             }
             else
@@ -41,8 +42,9 @@ public class ApiAuthenticationStateProvider : AuthenticationStateProvider
                 return new AuthenticationState(_anonymous);
             }
         }
-        catch
+        catch (Exception ex)
         {
+            Console.WriteLine($"Error in GetAuthenticationStateAsync: {ex}");
             // If any error occurs, return anonymous user
             return new AuthenticationState(_anonymous);
         }
@@ -51,7 +53,8 @@ public class ApiAuthenticationStateProvider : AuthenticationStateProvider
     public void NotifyUserAuthentication(string token)
     {
         var claims = ParseClaimsFromJwt(token);
-        var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "jwt"));
+        var identity = new ClaimsIdentity(claims, "Bearer", ClaimTypes.Name, ClaimTypes.Role);
+        var user = new ClaimsPrincipal(identity);
         var authState = Task.FromResult(new AuthenticationState(user));
         NotifyAuthenticationStateChanged(authState);
     }
@@ -65,8 +68,16 @@ public class ApiAuthenticationStateProvider : AuthenticationStateProvider
 
     private IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
     {
-        var handler = new JwtSecurityTokenHandler();
-        var token = handler.ReadJwtToken(jwt);
-        return token.Claims;
+        try
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(jwt);
+            return token.Claims;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error parsing JWT token: {ex}");
+            return Enumerable.Empty<Claim>();
+        }
     }
 } 
