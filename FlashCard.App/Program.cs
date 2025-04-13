@@ -6,32 +6,44 @@ using MudBlazor.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Components.Server;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
+builder.Services.AddServerSideBlazor(options =>
+{
+    options.DetailedErrors = true;
+});
+builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddScoped<ProtectedLocalStorage>();
+builder.Services.AddScoped<ApiAuthenticationStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider>(provider => 
+    provider.GetRequiredService<ApiAuthenticationStateProvider>());
 builder.Services.AddMudServices();
 
-// Auth services
-builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
-builder.Services.AddAuthorizationCore();
-
-// Configure HttpClient with auth handler
-builder.Services.AddScoped<HttpAuthorizationMessageHandler>();
-builder.Services.AddHttpClient("API", client => 
+// HTTP client for authenticated endpoints
+builder.Services.AddHttpClient("AuthAPI", client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"] ?? "https://localhost:5001");
+    client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5170");
 }).AddHttpMessageHandler<HttpAuthorizationMessageHandler>();
 
-builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("API"));
+// HTTP client for public endpoints (login, register)
+builder.Services.AddHttpClient("PublicAPI", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5170");
+});
 
-// Other services
+// Register services
 builder.Services.AddScoped<IGenerationService, GenerationService>();
+builder.Services.AddScoped<HttpAuthorizationMessageHandler>();
 builder.Services.AddScoped<IFlashcardService, FlashcardService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 

@@ -48,14 +48,14 @@
 
     // Login
     private MudForm loginForm;
-    private LoginModel loginModel = new();
+    private LoginRequest loginModel = new();
     private bool isLoginValid;
     private bool isLoginLoading;
     private string loginError;
 
     // Register
     private MudForm registerForm;
-    private RegisterModel registerModel = new();
+    private RegisterRequest registerModel = new();
     private bool isRegisterValid;
     private bool isRegisterLoading;
     private string registerError;
@@ -103,29 +103,24 @@
             var result = await AuthService.LoginAsync(loginModel);
             if (result.Successful)
             {
-                await Task.Delay(100);
-                var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-                if (authState.User.Identity is not null)
+                var authStateProvider = (AuthStateProvider as ApiAuthenticationStateProvider);
+                if (authStateProvider != null)
                 {
-                    if (authState.User.Identity.IsAuthenticated)
+                    await authStateProvider.MarkUserAsAuthenticated(result.Token!);
+                    await Task.Delay(100);
+                    var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+                    if (authState.User.Identity?.IsAuthenticated ?? false)
                     {
                         NavigationManager.NavigateTo("/");
                     }
                     else
                     {
                         loginError = "Błąd uwierzytelniania - token został zapisany, ale użytkownik nie jest uwierzytelniony.";
-                        ((ApiAuthenticationStateProvider)AuthStateProvider).NotifyUserAuthentication(result.Token!);
-                        await Task.Delay(100);
-                        authState = await AuthStateProvider.GetAuthenticationStateAsync();
-                        if (authState.User.Identity.IsAuthenticated)
-                        {
-                            NavigationManager.NavigateTo("/");
-                        }
                     }
                 }
                 else
                 {
-                    loginError = "Błąd uwierzytelniania - brak tożsamości użytkownika.";
+                    loginError = "Błąd uwierzytelniania - nie można uzyskać dostępu do providera stanu uwierzytelniania.";
                 }
             }
             else
@@ -174,7 +169,7 @@
             if (result.Successful)
             {
                 Snackbar.Add("Rejestracja zakończona pomyślnie. Możesz się teraz zalogować.", Severity.Success);
-                registerModel = new RegisterModel(); // Clear form
+                registerModel = new RegisterRequest(); // Clear form
                 await registerForm.ResetAsync(); // Reset validation
             }
             else
@@ -194,7 +189,7 @@
 
     private async Task Logout()
     {
-        await AuthService.Logout();
+        await AuthService.LogoutAsync();
         NavigationManager.NavigateTo("/");
         Snackbar.Add("Wylogowano pomyślnie", Severity.Success);
     }

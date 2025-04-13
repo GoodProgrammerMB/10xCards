@@ -35,31 +35,25 @@ public record Message
 public record ResponseFormat
 {
     [JsonPropertyName("type")]
-    public string Type { get; init; } = "json_schema";
-
-    [JsonPropertyName("schema")]
-    public object Schema { get; init; } = new();
+    public string Type { get; init; } = "json_object";
 }
 
-public record OpenRouterResponse
+public class OpenRouterResponse
 {
-    [JsonPropertyName("choices")]
-    public List<Choice> Choices { get; init; } = new();
-
-    [JsonPropertyName("model")]
-    public string Model { get; init; } = string.Empty;
-
-    [JsonPropertyName("usage")]
-    public Usage Usage { get; init; } = new();
+    public List<OpenRouterChoice>? Choices { get; set; }
+    public Usage? Usage { get; set; }
 }
 
-public record Choice
+public class OpenRouterChoice
 {
-    [JsonPropertyName("message")]
-    public Message Message { get; init; } = new();
-
+    public OpenRouterMessage? Message { get; set; }
     [JsonPropertyName("finish_reason")]
-    public string FinishReason { get; init; } = string.Empty;
+    public string? FinishReason { get; set; }
+}
+
+public class OpenRouterMessage
+{
+    public string? Content { get; set; }
 }
 
 public record Usage

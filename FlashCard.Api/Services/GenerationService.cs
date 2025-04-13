@@ -4,50 +4,36 @@ using System.Text.Json;
 using FlashCard.Api.Configuration;
 using FlashCard.Api.Data;
 using FlashCard.Api.Models;
-using Microsoft.Extensions.Options;
+using FlashCard.Api.Services.OpenRouter;
+using FlashCard.Api.Services.OpenRouter.Models;
 using Microsoft.Extensions.Logging;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
-using System.Threading;
 
 namespace FlashCard.Api.Services;
 
 public class GenerationService : IGenerationService
 {
     private readonly ILogger<GenerationService> _logger;
-    private readonly HttpClient _httpClient;
     private readonly FlashCardDbContext _dbContext;
-    private readonly OpenRouterOptions _options;
-    private const string GenerationEndpoint = "/generations";
-    
+    private readonly IOpenRouterService _openRouterService;
+
     public GenerationService(
         ILogger<GenerationService> logger,
-        HttpClient httpClient,
         FlashCardDbContext dbContext,
-        IOptions<OpenRouterOptions> options)
+        IOpenRouterService openRouterService)
     {
         _logger = logger;
-        _httpClient = httpClient;
         _dbContext = dbContext;
-        _options = options.Value;
-        
-        _httpClient.BaseAddress = new Uri(_options.BaseUrl);
-        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_options.ApiKey}");
-        _httpClient.Timeout = TimeSpan.FromSeconds(_options.TimeoutSeconds);
+        _openRouterService = openRouterService;
     }
 
     public async Task<GenerationResponseDto> GenerateFlashcardsAsync(GenerationRequestDto request, int userId, CancellationToken cancellationToken = default)
     {
         try
         {
-            var response = await _httpClient.PostAsJsonAsync(GenerationEndpoint, request, cancellationToken);
-            response.EnsureSuccessStatusCode();
-            
             var generation = new Generation
             {
                 UserId = userId,
-                Model = request.Model ?? "default",
+                Model = request.Model ?? _openRouterService.DefaultModelName,
                 SourceTextHash = ComputeHash(request.SourceText),
                 GeneratedCount = 0,
                 CreatedAt = DateTime.UtcNow,
@@ -56,14 +42,34 @@ public class GenerationService : IGenerationService
             
             await _dbContext.Generations.AddAsync(generation, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
-            
-            var openRouterResponse = await response.Content.ReadFromJsonAsync<OpenRouterResponse>(cancellationToken: cancellationToken);
-            var content = openRouterResponse?.Choices?.FirstOrDefault()?.Message?.Content;
-            
-            if (string.IsNullOrEmpty(content))
+
+            var systemMessage = @"You are a helpful AI assistant that creates flashcards from provided text. 
+                Create concise and clear flashcards in JSON format. Each flashcard should have 'front' and 'back' fields.
+                The front should contain a question or concept, and the back should contain the answer or explanation.
+                Return only valid JSON array of flashcards without any additional text.";
+
+            var userMessage = $"Create flashcards from this text: {request.SourceText}";
+
+            var parameters = new Dictionary<string, object>
             {
-                throw new Exception("Empty response from OpenRouter API");
-            }
+                { "temperature", 0.7 },
+                { "max_tokens", 1000 }
+            };
+
+            var responseFormat = new ResponseFormat 
+            { 
+                Type = "json_object"
+            };
+
+            var response = await _openRouterService.SendRequest(
+                userMessage,
+                systemMessage,
+                generation.Model,
+                parameters,
+                responseFormat,
+                cancellationToken);
+
+            var content = await _openRouterService.GetResponseContent(response);
             
             var flashcards = JsonSerializer.Deserialize<List<GenerationFlashcardDto>>(content);
             if (flashcards == null || !flashcards.Any())
@@ -108,20 +114,4 @@ public class GenerationService : IGenerationService
         var hash = sha256.ComputeHash(bytes);
         return Convert.ToBase64String(hash);
     }
-}
-
-// Klasy pomocnicze do deserializacji odpowiedzi z OpenRouter
-file class OpenRouterResponse
-{
-    public List<OpenRouterChoice>? Choices { get; set; }
-}
-
-file class OpenRouterChoice
-{
-    public OpenRouterMessage? Message { get; set; }
-}
-
-file class OpenRouterMessage
-{
-    public string? Content { get; set; }
 } 

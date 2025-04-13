@@ -1,36 +1,48 @@
 using System.Net.Http.Json;
 using FlashCard.App.Models;
+using Microsoft.Extensions.Logging;
 
-namespace FlashCard.App.Services
+namespace FlashCard.App.Services;
+
+public class GenerationService : IGenerationService
 {
-    public interface IGenerationService
+    private readonly HttpClient _httpClient;
+    private readonly ILogger<GenerationService> _logger;
+
+    public GenerationService(IHttpClientFactory httpClientFactory, ILogger<GenerationService> logger)
     {
-        Task<GenerationResponseDTO> GenerateFlashcardsAsync(GenerationRequestDTO request);
+        _httpClient = httpClientFactory.CreateClient("AuthAPI");
+        _logger = logger;
     }
 
-    public class GenerationService : IGenerationService
+    public async Task<GenerationResponseDTO> GenerateFlashcardsAsync(GenerationRequestDTO request)
     {
-        private readonly HttpClient _httpClient;
-        private const string GenerationEndpoint = "api/generations";
-
-        public GenerationService(HttpClient httpClient)
+        try
         {
-            _httpClient = httpClient;
+            _logger.LogInformation("Wysyłanie żądania generowania fiszek");
+            var response = await _httpClient.PostAsJsonAsync("/api/generations", request);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                _logger.LogError("Błąd podczas generowania fiszek: {StatusCode} - {Error}", 
+                    response.StatusCode, error);
+                throw new Exception($"Błąd podczas generowania fiszek: {response.StatusCode}");
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<GenerationResponseDTO>();
+            if (result == null)
+            {
+                throw new Exception("Otrzymano pustą odpowiedź z API");
+            }
+
+            _logger.LogInformation("Pomyślnie wygenerowano {Count} fiszek", result.Flashcards.Count);
+            return result;
         }
-
-        public async Task<GenerationResponseDTO> GenerateFlashcardsAsync(GenerationRequestDTO request)
+        catch (Exception ex)
         {
-            try
-            {
-                var response = await _httpClient.PostAsJsonAsync(GenerationEndpoint, request);
-                response.EnsureSuccessStatusCode();
-                return await response.Content.ReadFromJsonAsync<GenerationResponseDTO>();
-            }
-            catch (Exception ex)
-            {
-                // TODO: Add proper error handling and logging
-                throw new Exception("Błąd podczas generowania fiszek", ex);
-            }
+            _logger.LogError(ex, "Błąd podczas generowania fiszek");
+            throw;
         }
     }
 } 

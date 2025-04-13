@@ -8,7 +8,7 @@ using FlashCard.Api.Services.OpenRouter.Exceptions;
 
 namespace FlashCard.Api.Services.OpenRouter;
 
-public class OpenRouterService
+public class OpenRouterService : IOpenRouterService
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<OpenRouterService> _logger;
@@ -27,14 +27,14 @@ public class OpenRouterService
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        
-        _apiKey = configuration["OpenRouter:ApiKey"] 
+
+        _apiKey = configuration["OpenRouter:ApiKey"]
             ?? throw new ArgumentException("OpenRouter API key not found in configuration");
-        _apiEndpoint = configuration["OpenRouter:ApiEndpoint"] 
+        _apiEndpoint = configuration["OpenRouter:ApiEndpoint"]
             ?? throw new ArgumentException("OpenRouter API endpoint not found in configuration");
-        
+
         DefaultModelName = configuration["OpenRouter:DefaultModel"] ?? "openrouter-llm-v1";
-        
+
         _defaultParameters = new Dictionary<string, object>
         {
             { "temperature", 0.7 },
@@ -64,7 +64,7 @@ public class OpenRouterService
         }
 
         var messages = new List<Message>();
-        
+
         if (!string.IsNullOrWhiteSpace(systemMessage))
         {
             messages.Add(new Message
@@ -149,19 +149,19 @@ public class OpenRouterService
         try
         {
             var request = BuildPayload(userMessage, systemMessage, modelName, parameters, responseFormat);
-            
+
             using var response = await _httpClient.PostAsJsonAsync(_apiEndpoint, request, cancellationToken);
-            
+
             if (!response.IsSuccessStatusCode)
             {
                 var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
                 _logger.LogError("OpenRouter API error: {StatusCode} - {Error}", response.StatusCode, errorContent);
-                
+
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
                     throw new OpenRouterAuthenticationException("Invalid API key or authentication failed");
                 }
-                
+
                 throw new OpenRouterCommunicationException(
                     $"API request failed with status code {response.StatusCode}: {errorContent}",
                     (int)response.StatusCode);

@@ -116,14 +116,14 @@
 @code {
     // Login
     private MudForm loginForm;
-    private LoginModel loginModel = new();
+    private LoginRequest loginModel = new();
     private bool isLoginValid;
     private bool isLoginLoading;
     private string loginError;
 
     // Register
     private MudForm registerForm;
-    private RegisterModel registerModel = new();
+    private RegisterRequest registerModel = new();
     private bool isRegisterValid;
     private bool isRegisterLoading;
     private string registerError;
@@ -140,8 +140,12 @@
             var result = await AuthService.LoginAsync(loginModel);
             if (result.Successful)
             {
-                ((ApiAuthenticationStateProvider)AuthStateProvider).NotifyUserAuthentication(result.Token!);
-                NavigationManager.NavigateTo("/");
+                var authStateProvider = (AuthStateProvider as ApiAuthenticationStateProvider);
+                if (authStateProvider != null)
+                {
+                    await authStateProvider.MarkUserAsAuthenticated(result.Token!);
+                    NavigationManager.NavigateTo("/");
+                }
             }
             else
             {
@@ -189,7 +193,7 @@
             if (result.Successful)
             {
                 Snackbar.Add("Rejestracja zakończona pomyślnie. Możesz się teraz zalogować.", Severity.Success);
-                registerModel = new RegisterModel(); // Clear form
+                registerModel = new RegisterRequest(); // Clear form
                 await registerForm.ResetAsync(); // Reset validation
             }
             else

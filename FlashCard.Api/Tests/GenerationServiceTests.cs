@@ -1,12 +1,9 @@
-using System.Net;
-using FlashCard.Api.Configuration;
 using FlashCard.Api.Data;
 using FlashCard.Api.Models;
 using FlashCard.Api.Services;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using FlashCard.Api.Services.OpenRouter;
+using FlashCard.Api.Services.OpenRouter.Models;
 using Moq;
-using Moq.Protected;
 using Xunit;
 
 namespace FlashCard.Api.Tests;
@@ -15,21 +12,13 @@ public class GenerationServiceTests
 {
     private readonly Mock<ILogger<GenerationService>> _loggerMock;
     private readonly Mock<FlashCardDbContext> _dbContextMock;
-    private readonly Mock<HttpMessageHandler> _httpMessageHandlerMock;
-    private readonly OpenRouterOptions _options;
+    private readonly Mock<IOpenRouterService> _openRouterServiceMock;
     
     public GenerationServiceTests()
     {
         _loggerMock = new Mock<ILogger<GenerationService>>();
         _dbContextMock = new Mock<FlashCardDbContext>();
-        _httpMessageHandlerMock = new Mock<HttpMessageHandler>();
-        _options = new OpenRouterOptions
-        {
-            ApiKey = "test-key",
-            BaseUrl = "https://api.test.com",
-            DefaultModel = "test-model",
-            TimeoutSeconds = 30
-        };
+        _openRouterServiceMock = new Mock<IOpenRouterService>();
     }
     
     [Fact]
@@ -43,26 +32,40 @@ public class GenerationServiceTests
             Model = "test-model"
         };
         
-        const string jsonResponse = @"{""choices"":[{""message"":{""content"":""[{\\""front\\"":""Test Question"",\\""back\\"":""Test Answer"",\\""source\\"":""ai-full""}]""}}]}";
-        var httpResponse = new HttpResponseMessage
+        var jsonResponse = @"[{""front"":""Test Question"",""back"":""Test Answer"",""source"":""ai-full""}]";
+        var openRouterResponse = new OpenRouterResponse
         {
-            StatusCode = HttpStatusCode.OK,
-            Content = new StringContent(jsonResponse)
+            Choices = new List<OpenRouterChoice>
+            {
+                new OpenRouterChoice
+                {
+                    Message = new OpenRouterMessage
+                    {
+                        Content = jsonResponse
+                    }
+                }
+            }
         };
         
-        _httpMessageHandlerMock
-            .Protected()
-            .Setup<Task<HttpResponseMessage>>(
-                "SendAsync",
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>())
-            .ReturnsAsync(httpResponse);
+        _openRouterServiceMock
+            .Setup(x => x.DefaultModelName)
+            .Returns("test-model");
             
-        var httpClient = new HttpClient(_httpMessageHandlerMock.Object);
-        var optionsMock = new Mock<IOptions<OpenRouterOptions>>();
-        optionsMock.Setup(x => x.Value).Returns(_options);
+        _openRouterServiceMock
+            .Setup(x => x.SendRequest(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, object>>(),
+                It.IsAny<ResponseFormat>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(openRouterResponse);
+            
+        _openRouterServiceMock
+            .Setup(x => x.GetResponseContent(It.IsAny<OpenRouterResponse>()))
+            .ReturnsAsync(jsonResponse);
         
-        var service = new GenerationService(_loggerMock.Object, httpClient, _dbContextMock.Object, optionsMock.Object);
+        var service = new GenerationService(_loggerMock.Object, _dbContextMock.Object, _openRouterServiceMock.Object);
         
         // Act
         var result = await service.GenerateFlashcardsAsync(request, userId);
@@ -87,25 +90,21 @@ public class GenerationServiceTests
             Model = "test-model"
         };
         
-        var httpResponse = new HttpResponseMessage
-        {
-            StatusCode = HttpStatusCode.InternalServerError,
-            Content = new StringContent("API Error")
-        };
-        
-        _httpMessageHandlerMock
-            .Protected()
-            .Setup<Task<HttpResponseMessage>>(
-                "SendAsync",
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>())
-            .ReturnsAsync(httpResponse);
+        _openRouterServiceMock
+            .Setup(x => x.DefaultModelName)
+            .Returns("test-model");
             
-        var httpClient = new HttpClient(_httpMessageHandlerMock.Object);
-        var optionsMock = new Mock<IOptions<OpenRouterOptions>>();
-        optionsMock.Setup(x => x.Value).Returns(_options);
+        _openRouterServiceMock
+            .Setup(x => x.SendRequest(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, object>>(),
+                It.IsAny<ResponseFormat>(),
+                It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new HttpRequestException("API Error"));
         
-        var service = new GenerationService(_loggerMock.Object, httpClient, _dbContextMock.Object, optionsMock.Object);
+        var service = new GenerationService(_loggerMock.Object, _dbContextMock.Object, _openRouterServiceMock.Object);
         
         // Act & Assert
         await Assert.ThrowsAsync<HttpRequestException>(() => 

@@ -27,10 +27,10 @@
 </CascadingAuthenticationState>
 
 @code {
-    private class RedirectToLogin : ComponentBase
+    public class RedirectToLogin : ComponentBase
     {
         [Inject]
-        private NavigationManager NavigationManager { get; set; }
+        public required NavigationManager NavigationManager { get; set; }
 
         protected override void OnInitialized()
         {

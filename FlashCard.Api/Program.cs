@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using FlashCard.Api.Services.OpenRouter;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,8 +58,7 @@ builder.Services.AddCors(options =>
         builder => builder
             .WithOrigins(
                 "https://localhost:7174",
-                "http://localhost:5007",
-                "http://localhost:5170"
+                "http://localhost:5007"
             )
             .AllowAnyMethod()
             .AllowAnyHeader()
@@ -74,7 +74,12 @@ builder.Services.Configure<OpenRouterOptions>(
     builder.Configuration.GetSection(OpenRouterOptions.SectionName));
 builder.Services.AddSingleton<IValidateOptions<OpenRouterOptions>, OpenRouterOptionsValidator>();
 
+// Configure HttpClient for OpenRouter
+builder.Services.AddHttpClient<IOpenRouterService, OpenRouterService>();
+
 // Configure Authentication
+var jwtLogger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -82,16 +87,44 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
+    var jwtKey = builder.Configuration["Jwt:Key"];
+    var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+    var jwtAudience = builder.Configuration["Jwt:Audience"];
+    
+    jwtLogger.LogInformation("JWT Configuration:");
+    jwtLogger.LogInformation("Issuer: {Issuer}", jwtIssuer);
+    jwtLogger.LogInformation("Audience: {Audience}", jwtAudience);
+    jwtLogger.LogInformation("Key length: {KeyLength}", jwtKey?.Length ?? 0);
+    
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
+        ValidIssuer = jwtIssuer,
+        ValidAudience = jwtAudience,
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+            Encoding.UTF8.GetBytes(jwtKey ?? throw new InvalidOperationException("JWT Key is missing")))
+    };
+    
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            jwtLogger.LogError(context.Exception, "Authentication failed");
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = context =>
+        {
+            jwtLogger.LogInformation("Token validated successfully");
+            return Task.CompletedTask;
+        },
+        OnMessageReceived = context =>
+        {
+            jwtLogger.LogInformation("Token received: {Token}", context.Token);
+            return Task.CompletedTask;
+        }
     };
 });
 
@@ -99,7 +132,7 @@ builder.Services.AddAuthorization();
 
 // Configure Services
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddHttpClient<IGenerationService, GenerationService>();
+builder.Services.AddScoped<IOpenRouterService, OpenRouterService>();
 builder.Services.AddScoped<IGenerationService, GenerationService>();
 
 var app = builder.Build();
@@ -145,28 +178,49 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Add endpoints
-app.MapPost("/generations", async (
+
+app.MapPost("/api/generations", async (
     GenerationRequestDto request,
     IGenerationService generationService,
     ClaimsPrincipal user,
+    ILogger<Program> logger,
+    HttpContext httpContext,
     CancellationToken cancellationToken) =>
 {
+    logger.LogInformation("Received request to /api/generations");
+    
+    // Log headers
+    var authHeader = httpContext.Request.Headers["Authorization"].ToString();
+    logger.LogInformation("Authorization header: {AuthHeader}", authHeader);
+    
+    // Log user claims
+    if (user?.Identity?.IsAuthenticated == true)
+    {
+        logger.LogInformation("User is authenticated");
+        foreach (var claim in user.Claims)
+        {
+            logger.LogInformation("Claim: {Type} = {Value}", claim.Type, claim.Value);
+        }
+    }
+    else
+    {
+        logger.LogWarning("User is not authenticated");
+    }
+
     var userId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? 
         throw new UnauthorizedAccessException("User not authenticated"));
         
+    logger.LogInformation("Processing request for user ID: {UserId}", userId);
+    
     var result = await generationService.GenerateFlashcardsAsync(request, userId, cancellationToken);
-    return Results.Created($"/generations/{result.Id}", result);
+    return Results.Created($"/api/generations/{result.Id}", result);
 })
 .RequireAuthorization()
 .WithName("GenerateFlashcards");
 
 // Add flashcards batch endpoint
-app.MapPost("/flashcards/batch", async (
-    BatchSaveRequest request,
-    FlashCardDbContext dbContext,
-    ClaimsPrincipal user,
-    CancellationToken cancellationToken) =>
+app.MapPost("/api/flashcards/batch", async (BatchSaveRequest request, FlashCardDbContext dbContext,
+    ClaimsPrincipal user, CancellationToken cancellationToken) =>
 {
     var userId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? 
         throw new UnauthorizedAccessException("User not authenticated"));
@@ -202,7 +256,7 @@ app.MapPost("/flashcards/batch", async (
         }
     };
 
-    return Results.Created("/flashcards/batch", response);
+    return Results.Created("/api/flashcards/batch", response);
 })
 .RequireAuthorization()
 .WithName("SaveFlashcardsBatch");
