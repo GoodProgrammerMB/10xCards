@@ -5,6 +5,7 @@
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ISnackbar Snackbar
+@inject ITokenStorageService TokenStorage
 
 <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-center justify-center" Style="height: 100vh;">
     <MudPaper Elevation="3" Class="pa-8" Style="width: 100%; max-width: 500px;">
@@ -127,6 +128,19 @@
     private bool isRegisterValid;
     private bool isRegisterLoading;
     private string registerError;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var token = await TokenStorage.GetTokenAsync(SessionKeys.Token);
+            if (!string.IsNullOrEmpty(token))
+            {
+                ((ApiAuthenticationStateProvider)AuthStateProvider).NotifyUserAuthentication(token);
+                NavigationManager.NavigateTo("/");
+            }
+        }
+    }
 
     private async Task HandleLogin()
     {

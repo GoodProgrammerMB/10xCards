@@ -15,16 +15,28 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices();
 
 // Auth services
-builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
+builder.Services.AddScoped<ITokenStorageService, TokenStorageService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
 builder.Services.AddAuthorizationCore();
 
 // Configure HttpClient with auth handler
 builder.Services.AddScoped<HttpAuthorizationMessageHandler>();
-builder.Services.AddHttpClient("API", client => 
+
+// Explicitly set the API base URL
+var apiBaseUrl = builder.Configuration["ApiBaseUrl"];
+if (string.IsNullOrEmpty(apiBaseUrl))
 {
-    client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"] ?? "https://localhost:5001");
+    // Fallback to development URL if not configured
+    apiBaseUrl = "http://localhost:5170"; // Zaktualizowany URL API
+}
+
+Console.WriteLine($"Using API URL: {apiBaseUrl}"); // Dodane logowanie
+
+builder.Services.AddHttpClient("API", client =>
+{
+    client.BaseAddress = new Uri(apiBaseUrl);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
 }).AddHttpMessageHandler<HttpAuthorizationMessageHandler>();
 
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("API"));

@@ -2,18 +2,19 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.JSInterop;
+using FlashCard.App.Models;
 
 namespace FlashCard.App.Services;
 
 public class ApiAuthenticationStateProvider : AuthenticationStateProvider
 {
-    private readonly ILocalStorageService _localStorage;
+    private readonly ITokenStorageService _tokenStorage;
     private readonly IJSRuntime _jsRuntime;
     private ClaimsPrincipal _anonymous = new ClaimsPrincipal(new ClaimsIdentity());
 
-    public ApiAuthenticationStateProvider(ILocalStorageService localStorage, IJSRuntime jsRuntime)
+    public ApiAuthenticationStateProvider(ITokenStorageService tokenStorage, IJSRuntime jsRuntime)
     {
-        _localStorage = localStorage;
+        _tokenStorage = tokenStorage;
         _jsRuntime = jsRuntime;
     }
 
@@ -24,7 +25,7 @@ public class ApiAuthenticationStateProvider : AuthenticationStateProvider
             // Check if we're running in prerendering mode
             if (_jsRuntime is IJSInProcessRuntime)
             {
-                var token = await _localStorage.GetItemAsync<string>("authToken");
+                var token = await _tokenStorage.GetTokenAsync(SessionKeys.Token);
                 
                 if (string.IsNullOrEmpty(token))
                 {

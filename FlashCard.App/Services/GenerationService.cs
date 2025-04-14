@@ -1,36 +1,36 @@
 using System.Net.Http.Json;
 using FlashCard.App.Models;
 
-namespace FlashCard.App.Services
+namespace FlashCard.App.Services;
+
+public interface IGenerationService
 {
-    public interface IGenerationService
+    Task<GenerationResponseDto> GenerateFlashcardsAsync(GenerationRequest request);
+    Task<BatchSaveResponse> SaveFlashcardsAsync(BatchSaveRequest request);
+}
+
+public class GenerationService : IGenerationService
+{
+    private readonly HttpClient _httpClient;
+
+    public GenerationService(HttpClient httpClient)
     {
-        Task<GenerationResponseDTO> GenerateFlashcardsAsync(GenerationRequestDTO request);
+        _httpClient = httpClient;
     }
 
-    public class GenerationService : IGenerationService
+    public async Task<GenerationResponseDto> GenerateFlashcardsAsync(GenerationRequest request)
     {
-        private readonly HttpClient _httpClient;
-        private const string GenerationEndpoint = "api/generations";
+        var response = await _httpClient.PostAsJsonAsync("api/generations", request);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<GenerationResponseDto>() 
+            ?? throw new Exception("Nie udało się przetworzyć odpowiedzi z serwera");
+    }
 
-        public GenerationService(HttpClient httpClient)
-        {
-            _httpClient = httpClient;
-        }
-
-        public async Task<GenerationResponseDTO> GenerateFlashcardsAsync(GenerationRequestDTO request)
-        {
-            try
-            {
-                var response = await _httpClient.PostAsJsonAsync(GenerationEndpoint, request);
-                response.EnsureSuccessStatusCode();
-                return await response.Content.ReadFromJsonAsync<GenerationResponseDTO>();
-            }
-            catch (Exception ex)
-            {
-                // TODO: Add proper error handling and logging
-                throw new Exception("Błąd podczas generowania fiszek", ex);
-            }
-        }
+    public async Task<BatchSaveResponse> SaveFlashcardsAsync(BatchSaveRequest request)
+    {
+        var response = await _httpClient.PostAsJsonAsync("api/flashcards/batch", request);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<BatchSaveResponse>() 
+            ?? throw new Exception("Nie udało się przetworzyć odpowiedzi z serwera");
     }
 } 

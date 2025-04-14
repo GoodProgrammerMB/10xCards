@@ -18,16 +18,16 @@ public interface IAuthService
 public class AuthService : IAuthService
 {
     private readonly HttpClient _httpClient;
-    private readonly ILocalStorageService _localStorage;
+    private readonly ITokenStorageService _tokenStorage;
     private readonly AuthenticationStateProvider _authStateProvider;
 
     public AuthService(
         HttpClient httpClient,
-        ILocalStorageService localStorage,
+        ITokenStorageService tokenStorage,
         AuthenticationStateProvider authStateProvider)
     {
         _httpClient = httpClient;
-        _localStorage = localStorage;
+        _tokenStorage = tokenStorage;
         _authStateProvider = authStateProvider;
     }
 
@@ -38,8 +38,8 @@ public class AuthService : IAuthService
         
         if (result?.Successful ?? false)
         {
-            await _localStorage.SetItemAsync("authToken", result.Token);
-            await _localStorage.SetItemAsync("user", result.User);
+            await _tokenStorage.SetTokenAsync(SessionKeys.Token, result.Token!);
+            await _tokenStorage.SetRefreshTokenAsync(SessionKeys.RefreshToken, result.Token!);
             ((ApiAuthenticationStateProvider)_authStateProvider).NotifyUserAuthentication(result.Token!);
         }
         
@@ -53,8 +53,8 @@ public class AuthService : IAuthService
         
         if (result?.Successful ?? false)
         {
-            await _localStorage.SetItemAsync("authToken", result.Token);
-            await _localStorage.SetItemAsync("user", result.User);
+            await _tokenStorage.SetTokenAsync(SessionKeys.Token, result.Token!);
+            await _tokenStorage.SetRefreshTokenAsync(SessionKeys.RefreshToken, result.Token!);
             ((ApiAuthenticationStateProvider)_authStateProvider).NotifyUserAuthentication(result.Token!);
         }
         
@@ -63,14 +63,13 @@ public class AuthService : IAuthService
 
     public async Task Logout()
     {
-        await _localStorage.RemoveItemAsync("authToken");
-        await _localStorage.RemoveItemAsync("user");
+        await _tokenStorage.DeleteTokensAsync();
         ((ApiAuthenticationStateProvider)_authStateProvider).NotifyUserLogout();
     }
 
     public async Task<bool> IsAuthenticated()
     {
-        var token = await _localStorage.GetItemAsync<string>("authToken");
+        var token = await _tokenStorage.GetTokenAsync(SessionKeys.Token);
         return !string.IsNullOrEmpty(token);
     }
 } 

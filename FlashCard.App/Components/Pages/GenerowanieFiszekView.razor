@@ -1,8 +1,11 @@
 @page "/generowanie-fiszek"
 @using FlashCard.App.Models
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
+@inject IGenerationService GenerationService
+@inject IJSRuntime JSRuntime
 @attribute [Authorize]
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
@@ -17,7 +20,17 @@
                 <MudSelectItem Value="@("gpt-3.5-turbo")">GPT-3.5 Turbo</MudSelectItem>
                 <MudSelectItem Value="@("gpt-4")">GPT-4</MudSelectItem>
             </MudSelect>
-            <MudButton Color="Color.Primary" OnClick="GenerateFlashcards" Class="mt-4">Generuj fiszki</MudButton>
+            <MudButton Color="Color.Primary" OnClick="GenerateFlashcards" Class="mt-4" Disabled="@isLoading">
+                @if (isLoading)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                    <MudText Class="ms-2">Generowanie...</MudText>
+                }
+                else
+                {
+                    <MudText>Generuj fiszki</MudText>
+                }
+            </MudButton>
         </MudForm>
     </MudPaper>
 
@@ -47,7 +60,20 @@
                     </MudListItem>
                 }
             </MudList>
-            <MudButton Color="Color.Primary" OnClick="SaveFlashcards" Class="mt-4">Zapisz wszystkie fiszki</MudButton>
+            <MudButton Color="Color.Primary" 
+                      OnClick="SaveFlashcards" 
+                      Class="mt-4" 
+                      Disabled="@(isLoading || !flashcards.Any())">
+                @if (isSaving)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                    <MudText Class="ms-2">Zapisywanie...</MudText>
+                }
+                else
+                {
+                    <MudText>Zapisz wszystkie fiszki</MudText>
+                }
+            </MudButton>
         </MudPaper>
     }
 </MudContainer>
@@ -56,72 +82,120 @@
     private MudForm form = null!;
     private GenerationRequest request = new();
     private bool isLoading;
+    private bool isSaving;
     private List<GeneratedFlashcard> flashcards = new();
+    private int? currentGenerationId;
+
+    protected override void OnInitialized()
+    {
+        // Ustaw domyślny model
+        if (string.IsNullOrEmpty(request.Model))
+        {
+            request.Model = "gpt-3.5-turbo";
+        }
+    }
 
     private async Task GenerateFlashcards()
     {
-        await form.Validate();
-        if (!form.IsValid) return;
+        if (JSRuntime is not IJSInProcessRuntime)
+        {
+            await form.Validate();
+            if (!form.IsValid) return;
 
-        isLoading = true;
-        try
-        {
-            // TODO: Implement generation logic
-            await Task.Delay(2000); // Simulate API call
-            flashcards = new List<GeneratedFlashcard>
+            isLoading = true;
+            try
             {
-                new() { Front = "Sample question 1", Back = "Sample answer 1" },
-                new() { Front = "Sample question 2", Back = "Sample answer 2" }
-            };
-            Snackbar.Add("Fiszki zostały wygenerowane", Severity.Success);
-        }
-        catch
-        {
-            Snackbar.Add("Wystąpił błąd podczas generowania fiszek", Severity.Error);
-        }
-        finally
-        {
-            isLoading = false;
+                var response = await GenerationService.GenerateFlashcardsAsync(request);
+                flashcards = response.Flashcards;
+                currentGenerationId = response.Id;
+                Snackbar.Add("Fiszki zostały wygenerowane", Severity.Success);
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Wystąpił błąd podczas generowania fiszek: {ex.Message}", Severity.Error);
+            }
+            finally
+            {
+                isLoading = false;
+                StateHasChanged();
+            }
         }
     }
 
     private async Task EditFlashcard(GeneratedFlashcard flashcard)
     {
-        var parameters = new DialogParameters
+        if (JSRuntime is not IJSInProcessRuntime)
         {
-            ["Flashcard"] = flashcard
-        };
+            var parameters = new DialogParameters
+            {
+                ["Flashcard"] = flashcard
+            };
 
-        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
-        var dialog = DialogService.Show<FlashcardEditDialog>("Edytuj fiszkę", parameters, options);
-        var result = await dialog.Result;
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+            var dialog = DialogService.Show<FlashcardEditDialog>("Edytuj fiszkę", parameters, options);
+            var result = await dialog.Result;
 
-        if (!result.Canceled)
-        {
-            var editedFlashcard = (GeneratedFlashcard)result.Data;
-            var index = flashcards.IndexOf(flashcard);
-            flashcards[index] = editedFlashcard;
-            Snackbar.Add("Fiszka została zaktualizowana", Severity.Success);
+            if (!result.Canceled)
+            {
+                var editedFlashcard = (GeneratedFlashcard)result.Data;
+                var index = flashcards.IndexOf(flashcard);
+                flashcards[index] = editedFlashcard;
+                Snackbar.Add("Fiszka została zaktualizowana", Severity.Success);
+                StateHasChanged();
+            }
         }
     }
 
     private void DeleteFlashcard(GeneratedFlashcard flashcard)
     {
-        flashcards.Remove(flashcard);
-        Snackbar.Add("Fiszka została usunięta", Severity.Success);
+        if (JSRuntime is not IJSInProcessRuntime)
+        {
+            flashcards.Remove(flashcard);
+            Snackbar.Add("Fiszka została usunięta", Severity.Success);
+            StateHasChanged();
+        }
     }
 
     private async Task SaveFlashcards()
     {
-        try
+        if (JSRuntime is not IJSInProcessRuntime)
         {
-            // TODO: Implement save logic
-            await Task.Delay(1000); // Simulate API call
-            Snackbar.Add("Fiszki zostały zapisane", Severity.Success);
-        }
-        catch
-        {
-            Snackbar.Add("Wystąpił błąd podczas zapisywania fiszek", Severity.Error);
+            if (!currentGenerationId.HasValue)
+            {
+                Snackbar.Add("Brak identyfikatora generacji", Severity.Error);
+                return;
+            }
+
+            isSaving = true;
+            try
+            {
+                var request = new BatchSaveRequest
+                {
+                    Flashcards = flashcards.Select(f => new GeneratedFlashcard
+                    {
+                        Front = f.Front,
+                        Back = f.Back,
+                        GenerationId = currentGenerationId
+                    }).ToList()
+                };
+
+                var response = await GenerationService.SaveFlashcardsAsync(request);
+                Snackbar.Add($"Zapisano {response.Summary.TotalCreated} fiszek", Severity.Success);
+                
+                // Wyczyść listę po zapisaniu
+                flashcards.Clear();
+                currentGenerationId = null;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Wystąpił błąd podczas zapisywania fiszek: {ex.Message}", Severity.Error);
+            }
+            finally
+            {
+                isSaving = false;
+                StateHasChanged();
+            }
         }
     }
 } 

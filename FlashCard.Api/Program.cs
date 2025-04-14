@@ -146,7 +146,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Add endpoints
-app.MapPost("/generations", async (
+app.MapPost("/api/generations", async (
     GenerationRequestDto request,
     IGenerationService generationService,
     ClaimsPrincipal user,
@@ -156,13 +156,13 @@ app.MapPost("/generations", async (
         throw new UnauthorizedAccessException("User not authenticated"));
         
     var result = await generationService.GenerateFlashcardsAsync(request, userId, cancellationToken);
-    return Results.Created($"/generations/{result.Id}", result);
+    return Results.Created($"/api/generations/{result.Id}", result);
 })
 .RequireAuthorization()
 .WithName("GenerateFlashcards");
 
 // Add flashcards batch endpoint
-app.MapPost("/flashcards/batch", async (
+app.MapPost("/api/flashcards/batch", async (
     BatchSaveRequest request,
     FlashCardDbContext dbContext,
     ClaimsPrincipal user,
@@ -202,7 +202,7 @@ app.MapPost("/flashcards/batch", async (
         }
     };
 
-    return Results.Created("/flashcards/batch", response);
+    return Results.Created("/api/flashcards/batch", response);
 })
 .RequireAuthorization()
 .WithName("SaveFlashcardsBatch");

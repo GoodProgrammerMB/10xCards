@@ -1,7 +1,20 @@
 Frontend
-Blazor Server – wykorzystaj interaktywny model renderowania, w którym logika aplikacji działa po stronie serwera, co umożliwia szybkie i responsywne interakcje z użytkownikiem.
 
 MudBlazor Server – dodaj tę bibliotekę komponentów inspirowanych Material Design, aby szybko budować nowoczesne i estetyczne interfejsy użytkownika. Instalacja pakietu NuGet w projekcie klienta oraz dodanie przestrzeni nazw w pliku _imports.razor zapewni dostęp do gotowych komponentów, takich jak przyciski, tabele czy karty.
+- Utwórz nowy projekt Blazor Server App (dotnet new blazorserver -n MyMudBlazorApp)
+- Zainstaluj pakiet MudBlazor
+- W pliku _Imports.razor dodaj dyrektywę:
+@using MudBlazor
+aby mieć dostęp do komponentów MudBlazor w całym projekc
+- W pliku Program.cs  zarejestruj usługi MudBlazor, dodając:
+builder.Services.AddMudServices();
+-W pliku _Host.cshtml  uzupełnij sekcję <head> i/lub <body> o link do arkusza stylów oraz odwołanie do skryptu MudBlazor:
+<link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+...
+<script src="_content/MudBlazor/MudBlazor.min.js"></script>
+co pozwoli na prawidłowe ładowanie stylów i funkcjonalności komponentów
+- Zmodyfikuj układ interfejsu użytkownika (np. plik MainLayout.razor w folderze Shared), aby otoczyć stronę dostawcami MudBlazor, wstawiając takie komponenty jak:
+<MudThemeProvider>, <MudDialogProvider> i <MudSnackbarProvider> – to umożliwi korzystanie z globalnych ustawień stylów i powiadomień w całej aplikacji
 
 Backend i Baza Danych
 ASP.NET Core – wykorzystaj ten framework do budowy API oraz logiki biznesowej, co umożliwi skalowalną i bezpieczną obsługę po stronie serwera.

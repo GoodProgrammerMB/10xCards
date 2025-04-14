@@ -1,0 +1,21 @@
+<mermaid_diagram>
+graph LR
+  "Strona Logowania" -- "Dane logowania" --> "Endpoint Autoryzacji"
+  "Strona Rejestracji" -- "Dane rejestracji" --> "Endpoint Autoryzacji"
+  "Odzyskiwanie Hasła" -- "Prośba resetu" --> "Endpoint Autoryzacji"
+
+  "Endpoint Autoryzacji" ==> "Sukces" ==> "Dashboard / Zarządzanie Fiszkami"
+  "Endpoint Autoryzacji" -.-> "Błąd" -.-> "Strona Logowania"
+
+  "Dashboard / Zarządzanie Fiszkami" -- "Zarządzanie fiszkami" --> "Tworzenie fiszek ręcznie"
+  "Dashboard / Zarządzanie Fiszkami" -- "Generuj fiszki" --> "Generowanie fiszek AI"
+  "Dashboard / Zarządzanie fiszkami" -- "Rozpocznij naukę" --> "Sesja nauki"
+
+  "Generowanie fiszek AI" -- "Przekaż tekst" --> "Model LLM"
+  "Model LLM" ==> "Sugestie fiszek" ==> "Generowanie fiszek AI"
+
+  "Sesja nauki" -- "Plan powtórek" --> "Algorytm Powtórek"
+  "Algorytm Powtórek" ==> "Przypisz fiszki" ==> "Sesja nauki"
+
+  "Endpoint Autoryzacji" -- "Dostęp do danych" --> "Baza Użytkowników i Fiszek"
+</mermaid_diagram> 

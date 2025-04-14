@@ -121,6 +121,7 @@ Opis: Jako zalogowany użytkownik chcę mieć pewność, że moje fiszki nie są
 Kryteria akceptacji:
 - Tylko zalogowany użytkownik może wyświetlać, edytować i usuwać swoje fiszki.
 - Nie ma dostępu do fiszek innych użytkowników ani możliwości współdzielenia.
+- Cała aplikacja jest dostępna tylko dla zalogowanych użytkowników
 
 ## 6. Metryki sukcesu
 1. Efektywność generowania fiszek:
