@@ -1,63 +1,53 @@
 @using FlashCard.App.Models
-@using MudBlazor
+@inject ISnackbar Snackbar
 
 <MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6">Edytuj fiszkę</MudText>
     </TitleContent>
     <DialogContent>
-        <MudForm @ref="form" @bind-IsValid="@isValid">
-            <MudTextField T="string"
-                         @bind-Value="editedFlashcard.Front"
-                         Label="Przód fiszki"
-                         Required="true"
-                         RequiredError="Przód fiszki jest wymagany"
-                         Lines="3"
-                         Class="mb-4" />
-
-            <MudTextField T="string"
-                         @bind-Value="editedFlashcard.Back"
-                         Label="Tył fiszki"
-                         Required="true"
-                         RequiredError="Tył fiszki jest wymagany"
-                         Lines="5"
-                         Class="mb-4" />
-        </MudForm>
+        <MudTextField @bind-Value="editedFlashcard.Front"
+                     Label="Pytanie"
+                     Lines="3"
+                     Required="true"
+                     RequiredError="Pytanie jest wymagane" />
+        <MudTextField @bind-Value="editedFlashcard.Back"
+                     Label="Odpowiedź"
+                     Lines="3"
+                     Required="true"
+                     RequiredError="Odpowiedź jest wymagana"
+                     Class="mt-3" />
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Anuluj</MudButton>
-        <MudButton Color="Color.Primary" 
-                  OnClick="Submit" 
-                  Disabled="@(!isValid)">
-            Zapisz
-        </MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Zapisz</MudButton>
     </DialogActions>
 </MudDialog>
 
 @code {
-    [CascadingParameter] 
-    MudDialogInstance MudDialog { get; set; } = null!;
-
-    [Parameter] 
-    public Flashcard Flashcard { get; set; } = null!;
-
-    private MudForm form = null!;
-    private bool isValid;
-    private Flashcard editedFlashcard = new();
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+    [Parameter] public GeneratedFlashcard Flashcard { get; set; } = null!;
+    
+    private GeneratedFlashcard editedFlashcard = new();
 
     protected override void OnInitialized()
     {
-        editedFlashcard = new Flashcard
+        editedFlashcard = new GeneratedFlashcard
         {
-            Id = Flashcard.Id,
             Front = Flashcard.Front,
             Back = Flashcard.Back,
-            Source = Flashcard.Source
+            GenerationId = Flashcard.GenerationId
         };
     }
 
     private void Submit()
     {
+        if (string.IsNullOrWhiteSpace(editedFlashcard.Front) || string.IsNullOrWhiteSpace(editedFlashcard.Back))
+        {
+            Snackbar.Add("Wszystkie pola są wymagane", Severity.Warning);
+            return;
+        }
+
         MudDialog.Close(DialogResult.Ok(editedFlashcard));
     }
 

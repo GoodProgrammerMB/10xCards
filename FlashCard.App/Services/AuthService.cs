@@ -1,9 +1,5 @@
-using System.Net.Http.Json;
-using System.Text.Json;
 using FlashCard.App.Models;
 using Microsoft.AspNetCore.Components.Authorization;
-using System.Security.Claims;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace FlashCard.App.Services;
 
@@ -33,7 +29,7 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponse> RegisterAsync(RegisterModel model)
     {
-        var response = await _httpClient.PostAsJsonAsync("api/Users/register", model);
+        var response = await _httpClient.PostAsJsonAsync("api/Auth/register", model);
         var result = await response.Content.ReadFromJsonAsync<AuthResponse>();
         
         if (result?.Successful ?? false)
@@ -48,7 +44,7 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponse> LoginAsync(LoginModel model)
     {
-        var response = await _httpClient.PostAsJsonAsync("api/Users/login", model);
+        var response = await _httpClient.PostAsJsonAsync("api/Auth/login", model);
         var result = await response.Content.ReadFromJsonAsync<AuthResponse>();
         
         if (result?.Successful ?? false)

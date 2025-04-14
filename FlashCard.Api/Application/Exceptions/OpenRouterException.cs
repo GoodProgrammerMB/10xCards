@@ -1,4 +1,4 @@
-namespace FlashCard.Api.Services.OpenRouter.Exceptions;
+namespace FlashCard.Api.Application.Exceptions;
 
 public class OpenRouterException : Exception
 {

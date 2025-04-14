@@ -6,11 +6,11 @@ namespace FlashCard.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UsersController : ControllerBase
+public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
 
-    public UsersController(IAuthService authService)
+    public AuthController(IAuthService authService)
     {
         _authService = authService;
     }

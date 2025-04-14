@@ -1,35 +1,28 @@
 @using FlashCard.App.Models
 @using MudBlazor
+@inject ISnackbar Snackbar
 
 <MudPaper Class="pa-4">
     <MudText Typo="Typo.h5" Class="mb-4">Dodaj własną fiszkę</MudText>
 
     <MudForm @ref="form" @bind-IsValid="@isValid">
-        <MudTextField T="string"
-                     @bind-Value="newFlashcard.Front"
-                     Label="Przód fiszki"
-                     Variant="Variant.Outlined"
+        <MudTextField @bind-Value="flashcard.Front"
+                     Label="Pytanie"
                      Lines="3"
-                     Counter="200"
-                     MaxLength="200"
-                     Immediate="true"
-                     Validation="@(new Func<string, IEnumerable<string>>(ValidateFront))"
+                     Required="true"
+                     RequiredError="Pytanie jest wymagane"
                      Class="mb-4" />
         
-        <MudTextField T="string"
-                     @bind-Value="newFlashcard.Back"
-                     Label="Tył fiszki"
-                     Variant="Variant.Outlined"
-                     Lines="5"
-                     Counter="500"
-                     MaxLength="500"
-                     Immediate="true"
-                     Validation="@(new Func<string, IEnumerable<string>>(ValidateBack))"
+        <MudTextField @bind-Value="flashcard.Back"
+                     Label="Odpowiedź"
+                     Lines="3"
+                     Required="true"
+                     RequiredError="Odpowiedź jest wymagana"
                      Class="mb-4" />
 
         <MudButton Variant="Variant.Filled"
                    Color="Color.Primary"
-                   OnClick="HandleSubmit"
+                   OnClick="Submit"
                    Disabled="@(!isValid)">
             Dodaj fiszkę
         </MudButton>
@@ -37,12 +30,12 @@
 </MudPaper>
 
 @code {
-    [Parameter]
-    public EventCallback<FlashcardDTO> OnCreate { get; set; }
-
-    private MudForm form;
+    private MudForm form = null!;
     private bool isValid;
-    private FlashcardViewModel newFlashcard = new();
+    private GeneratedFlashcard flashcard = new();
+
+    [Parameter]
+    public EventCallback<GeneratedFlashcard> OnFlashcardAdded { get; set; }
 
     private IEnumerable<string> ValidateFront(string text)
     {
@@ -68,22 +61,19 @@
         }
     }
 
-    private async Task HandleSubmit()
+    private async Task Submit()
     {
-        if (isValid)
+        await form.Validate();
+        if (!form.IsValid) return;
+
+        if (string.IsNullOrWhiteSpace(flashcard.Front) || string.IsNullOrWhiteSpace(flashcard.Back))
         {
-            var flashcard = new FlashcardDTO
-            {
-                Front = newFlashcard.Front,
-                Back = newFlashcard.Back,
-                Source = "manual"
-            };
-
-            await OnCreate.InvokeAsync(flashcard);
-
-            // Reset form
-            newFlashcard = new FlashcardViewModel();
-            await form.ResetAsync();
+            Snackbar.Add("Wszystkie pola są wymagane", Severity.Warning);
+            return;
         }
+
+        await OnFlashcardAdded.InvokeAsync(flashcard);
+        flashcard = new GeneratedFlashcard();
+        form.Reset();
     }
 } 

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace FlashCard.Api.Models;
 
@@ -23,7 +24,9 @@ public class GenerationResponseDto
 
 public class GenerationFlashcardDto
 {
+    [JsonPropertyName("front")]
     public string Front { get; set; } = string.Empty;
+
+    [JsonPropertyName("back")]
     public string Back { get; set; } = string.Empty;
-    public string Source { get; set; } = string.Empty;
 } 

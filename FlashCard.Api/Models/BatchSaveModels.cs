@@ -18,10 +18,6 @@ public class BatchSaveFlashcard
     [MaxLength(500)]
     public string Back { get; set; } = string.Empty;
 
-    [Required]
-    [MaxLength(20)]
-    public string Source { get; set; } = string.Empty;
-
     public int? GenerationId { get; set; }
 }
 
@@ -36,7 +32,6 @@ public class SavedFlashcard
     public int Id { get; set; }
     public string Front { get; set; } = string.Empty;
     public string Back { get; set; } = string.Empty;
-    public string Source { get; set; } = string.Empty;
     public int? GenerationId { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }

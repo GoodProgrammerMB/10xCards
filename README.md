@@ -27,6 +27,11 @@
 - **AI Integration:**  
   - Communicates with Openrouter.ai to generate intelligent flashcard suggestions using HttpClient.
 
+- **Testing:**
+  - **Unit Tests:** xUnit with Moq for isolated component testing.
+  - **End-to-End Tests:** Playwright for frontend automation and comprehensive user flow validation.
+  - **API Tests:** HttpClient for integration testing of backend endpoints.
+
 - **CI/CD & Hosting:**  
   - GitHub Actions for continuous integration and deployment pipelines.
   - DigitalOcean for reliable and scalable hosting.
@@ -69,6 +74,12 @@ The application will be available at [http://localhost:5000](http://localhost:50
 - `dotnet build` – Build the application.  
 - `dotnet run` – Run the application.  
 - `dotnet test` – Run tests (if available).
+
+### Testing Commands
+- `./install-playwright.ps1` - Install Playwright browsers for E2E testing.
+- `./run-tests.ps1 -TestCategory Unit` - Run only unit tests.
+- `./run-tests.ps1 -TestCategory E2E` - Run only E2E tests.
+- `./run-tests.ps1` - Run all tests (unit and E2E).
 
 ### Node.js Commands (if applicable)
 - `npm install` – Install Node.js dependencies.

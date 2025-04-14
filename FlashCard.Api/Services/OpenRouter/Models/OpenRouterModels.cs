@@ -11,6 +11,7 @@ public record OpenRouterRequest
     public string Model { get; init; } = string.Empty;
 
     [JsonPropertyName("response_format")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ResponseFormat? ResponseFormat { get; init; }
 
     [JsonPropertyName("temperature")]
@@ -35,22 +36,32 @@ public record Message
 public record ResponseFormat
 {
     [JsonPropertyName("type")]
-    public string Type { get; init; } = "json_schema";
+    public string Type { get; init; } = "text";
 
     [JsonPropertyName("schema")]
-    public object Schema { get; init; } = new();
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public object? Schema { get; init; }
 }
 
 public record OpenRouterResponse
 {
+    [JsonPropertyName("id")]
+    public string Id { get; init; } = string.Empty;
+
     [JsonPropertyName("choices")]
     public List<Choice> Choices { get; init; } = new();
+
+    [JsonPropertyName("created")]
+    public long Created { get; init; }
 
     [JsonPropertyName("model")]
     public string Model { get; init; } = string.Empty;
 
+    [JsonPropertyName("object")]
+    public string Object { get; init; } = string.Empty;
+
     [JsonPropertyName("usage")]
-    public Usage Usage { get; init; } = new();
+    public Usage? Usage { get; init; }
 }
 
 public record Choice
@@ -60,6 +71,9 @@ public record Choice
 
     [JsonPropertyName("finish_reason")]
     public string FinishReason { get; init; } = string.Empty;
+
+    [JsonPropertyName("index")]
+    public int Index { get; init; }
 }
 
 public record Usage

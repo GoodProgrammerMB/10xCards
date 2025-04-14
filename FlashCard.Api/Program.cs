@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -99,6 +100,12 @@ builder.Services.AddAuthorization();
 
 // Configure Services
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddHttpClient<IOpenApiService, OpenApiService>(client =>
+{
+    var timeout = builder.Configuration.GetValue<int>("OpenRouter:TimeoutSeconds", 120);
+    client.Timeout = TimeSpan.FromSeconds(timeout);
+});
+builder.Services.AddScoped<IOpenApiService, OpenApiService>();
 builder.Services.AddHttpClient<IGenerationService, GenerationService>();
 builder.Services.AddScoped<IGenerationService, GenerationService>();
 
@@ -148,15 +155,62 @@ using (var scope = app.Services.CreateScope())
 // Add endpoints
 app.MapPost("/api/generations", async (
     GenerationRequestDto request,
-    IGenerationService generationService,
+    IOpenApiService openRouterService,
+    FlashCardDbContext dbContext,
     ClaimsPrincipal user,
     CancellationToken cancellationToken) =>
 {
+    string ComputeHash(string input)
+    {
+        using var sha256 = System.Security.Cryptography.SHA256.Create();
+        var bytes = System.Text.Encoding.UTF8.GetBytes(input);
+        var hash = sha256.ComputeHash(bytes);
+        return Convert.ToBase64String(hash);
+    }
+
     var userId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? 
         throw new UnauthorizedAccessException("User not authenticated"));
-        
-    var result = await generationService.GenerateFlashcardsAsync(request, userId, cancellationToken);
-    return Results.Created($"/api/generations/{result.Id}", result);
+
+    // Przygotuj wiadomość dla modelu AI
+    var prompt = $"Generate flashcards from the following text: {request.SourceText}";
+    
+    // Wywołaj OpenRouter API
+    var responseContent = await openRouterService.GetChatResponseAsync(
+        userMessage: prompt,
+        systemMessage: "You are a helpful AI assistant that creates educational flashcards. Each flashcard should have a front (question/term) and back (answer/definition). Generate the flashcards in JSON format as an array of objects with 'front' and 'back' properties.",
+        modelName: request.Model,
+        cancellationToken: cancellationToken
+    );
+
+    // Zapisz generację w bazie danych
+    var generation = new Generation
+    {
+        UserId = userId,
+        Name = "Flashcards Generation",
+        Model = request.Model ?? openRouterService.DefaultModelName,
+        SourceTextHash = ComputeHash(request.SourceText),
+        CreatedAt = DateTime.UtcNow,
+        UpdatedAt = DateTime.UtcNow
+    };
+
+    dbContext.Generations.Add(generation);
+    await dbContext.SaveChangesAsync(cancellationToken);
+
+    var flashcards = JsonSerializer.Deserialize<List<GenerationFlashcardDto>>(responseContent) 
+        ?? throw new Exception("Failed to parse flashcards from API response");
+
+    generation.GeneratedCount = flashcards.Count;
+    await dbContext.SaveChangesAsync(cancellationToken);
+
+    return Results.Created($"/api/generations/{generation.Id}", new GenerationResponseDto
+    {
+        Id = generation.Id,
+        UserId = userId,
+        Model = generation.Model,
+        GeneratedCount = generation.GeneratedCount,
+        Flashcards = flashcards,
+        CreatedAt = generation.CreatedAt
+    });
 })
 .RequireAuthorization()
 .WithName("GenerateFlashcards");
