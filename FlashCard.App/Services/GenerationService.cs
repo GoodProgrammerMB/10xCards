@@ -28,7 +28,18 @@ public class GenerationService : IGenerationService
 
     public async Task<BatchSaveResponse> SaveFlashcardsAsync(BatchSaveRequest request)
     {
-        var response = await _httpClient.PostAsJsonAsync("api/flashcards/batch", request);
+        // Przekształć dane do formatu oczekiwanego przez API
+        var apiRequest = new
+        {
+            Flashcards = request.Flashcards.Select(f => new 
+            {
+                Front = f.FrontDisplay,
+                Back = f.BackDisplay,
+                GenerationId = f.GenerationId
+            }).ToList()
+        };
+
+        var response = await _httpClient.PostAsJsonAsync("api/flashcards/batch", apiRequest);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<BatchSaveResponse>() 
             ?? throw new Exception("Nie udało się przetworzyć odpowiedzi z serwera");

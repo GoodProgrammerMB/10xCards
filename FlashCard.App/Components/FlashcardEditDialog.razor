@@ -1,4 +1,5 @@
 @using FlashCard.App.Models
+@using System.Text.Json
 @inject ISnackbar Snackbar
 
 <MudDialog>
@@ -6,12 +7,12 @@
         <MudText Typo="Typo.h6">Edytuj fiszkę</MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField @bind-Value="editedFlashcard.Front"
+        <MudTextField @bind-Value="frontText"
                      Label="Pytanie"
                      Lines="3"
                      Required="true"
                      RequiredError="Pytanie jest wymagane" />
-        <MudTextField @bind-Value="editedFlashcard.Back"
+        <MudTextField @bind-Value="backText"
                      Label="Odpowiedź"
                      Lines="3"
                      Required="true"
@@ -29,9 +30,15 @@
     [Parameter] public GeneratedFlashcard Flashcard { get; set; } = null!;
     
     private GeneratedFlashcard editedFlashcard = new();
+    private string frontText = string.Empty;
+    private string backText = string.Empty;
 
     protected override void OnInitialized()
     {
+        // Inicjalizacja tekstów z właściwości pomocniczych
+        frontText = Flashcard.FrontDisplay;
+        backText = Flashcard.BackDisplay;
+        
         editedFlashcard = new GeneratedFlashcard
         {
             Front = Flashcard.Front,
@@ -42,13 +49,27 @@
 
     private void Submit()
     {
-        if (string.IsNullOrWhiteSpace(editedFlashcard.Front) || string.IsNullOrWhiteSpace(editedFlashcard.Back))
+        if (string.IsNullOrWhiteSpace(frontText) || string.IsNullOrWhiteSpace(backText))
         {
             Snackbar.Add("Wszystkie pola są wymagane", Severity.Warning);
             return;
         }
+        
+        // Tworzymy nową uproszczoną strukturę Front i Back
+        try 
+        {
+            var simpleFront = JsonSerializer.Serialize(new { Word = frontText });
+            var simpleBack = JsonSerializer.Serialize(new { Example_Translation = backText });
+            
+            editedFlashcard.Front = JsonDocument.Parse(simpleFront).RootElement;
+            editedFlashcard.Back = JsonDocument.Parse(simpleBack).RootElement;
 
-        MudDialog.Close(DialogResult.Ok(editedFlashcard));
+            MudDialog.Close(DialogResult.Ok(editedFlashcard));
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Błąd podczas zapisywania fiszki: {ex.Message}", Severity.Error);
+        }
     }
 
     private void Cancel() => MudDialog.Cancel();

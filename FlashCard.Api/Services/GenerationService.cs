@@ -65,7 +65,16 @@ public class GenerationService : IGenerationService
                 throw new Exception("Empty response from OpenRouter API");
             }
             
-            var flashcards = JsonSerializer.Deserialize<List<GenerationFlashcardDto>>(content);
+            // Sanityzacja i parsowanie odpowiedzi JSON
+            content = SanitizeJsonResponse(content);
+            
+            var jsonOptions = new JsonSerializerOptions 
+            { 
+                PropertyNameCaseInsensitive = true,
+                AllowTrailingCommas = true 
+            };
+            
+            var flashcards = JsonSerializer.Deserialize<List<GenerationFlashcardDto>>(content, jsonOptions);
             if (flashcards == null || !flashcards.Any())
             {
                 throw new Exception("Failed to parse flashcards from API response");
@@ -107,6 +116,59 @@ public class GenerationService : IGenerationService
         var bytes = Encoding.UTF8.GetBytes(input);
         var hash = sha256.ComputeHash(bytes);
         return Convert.ToBase64String(hash);
+    }
+
+    private static string SanitizeJsonResponse(string content)
+    {
+        content = content.Trim();
+        
+        // Usuń nagłówki markdown
+        if (content.StartsWith("```json") || content.StartsWith("```"))
+        {
+            var startIndex = content.IndexOf('[');
+            var endIndex = content.LastIndexOf(']');
+            
+            if (startIndex >= 0 && endIndex > startIndex)
+            {
+                content = content.Substring(startIndex, endIndex - startIndex + 1);
+            }
+        }
+        
+        // Sprawdź, czy już mamy tablicę JSON
+        if (!content.StartsWith("[") || !content.EndsWith("]"))
+        {
+            // Znajdź początek tablicy
+            var startIndex = content.IndexOf('[');
+            
+            if (startIndex >= 0)
+            {
+                // Wytnij tekst od początku array
+                content = content.Substring(startIndex);
+                
+                // Sprawdź czy array jest poprawnie zakończony
+                var endIndex = content.LastIndexOf(']');
+                
+                if (endIndex > 0)
+                {
+                    // Mamy początek i koniec tablicy
+                    content = content.Substring(0, endIndex + 1);
+                }
+                else
+                {
+                    // Nie ma zamykającego nawiasu - musimy go dodać
+                    // Ale najpierw sprawdźmy, czy kończy się przecinkiem
+                    content = content.TrimEnd();
+                    if (content.EndsWith(","))
+                    {
+                        content = content.Substring(0, content.Length - 1);
+                    }
+                    // Dodaj zamykający nawias
+                    content += "]";
+                }
+            }
+        }
+        
+        return content;
     }
 }
 

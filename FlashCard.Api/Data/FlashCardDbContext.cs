@@ -41,7 +41,7 @@ public class FlashCardDbContext : DbContext
             entity.HasOne(f => f.Generation)
                 .WithMany(g => g.Flashcards)
                 .HasForeignKey(f => f.GenerationId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction);
         });
 
         modelBuilder.Entity<Generation>(entity =>

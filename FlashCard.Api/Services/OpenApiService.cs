@@ -68,7 +68,7 @@ public class OpenApiService : IOpenApiService
         {
             { "temperature", 0.7 },
             { "top_p", 0.95 },
-            { "max_tokens", 150 }
+            { "max_tokens", 750 }
         };
 
         // Konfiguracja HttpClient
@@ -185,6 +185,10 @@ public class OpenApiService : IOpenApiService
                     throw new OpenRouterValidationException("Response contains no valid content");
                 }
                 
+                // Formatowanie zawartości do poprawnego JSON-a z fiszkami
+                string messageContent = result.Choices[0].Message.Content;
+                messageContent = FormatResponseToValidFlashcardsJson(messageContent);
+                
                 if (result.Usage != null)
                 {
                     _logger.LogInformation(
@@ -194,7 +198,7 @@ public class OpenApiService : IOpenApiService
                         result.Usage.TotalTokens);
                 }
 
-                return result.Choices[0].Message.Content;
+                return messageContent;
             }
             catch (JsonException ex)
             {
@@ -216,5 +220,103 @@ public class OpenApiService : IOpenApiService
             _logger.LogError(ex, "Unexpected error during API request");
             throw new OpenRouterException("Unexpected error during API request", ex);
         }
+    }
+
+    private string FormatResponseToValidFlashcardsJson(string content)
+    {
+        content = content.Trim();
+        
+        // Usuń wszelkie nagłówki markdown
+        if (content.StartsWith("```json") || content.StartsWith("```"))
+        {
+            var startIndex = content.IndexOf('[');
+            var endIndex = content.LastIndexOf(']');
+            
+            if (startIndex >= 0 && endIndex > startIndex)
+            {
+                content = content.Substring(startIndex, endIndex - startIndex + 1);
+            }
+        }
+        
+        // Sprawdź czy zawartość to już poprawny JSON array
+        if (!content.StartsWith("[") || !content.EndsWith("]"))
+        {
+            // Jeśli nie, spróbuj znaleźć array w tekście
+            var startIndex = content.IndexOf('[');
+            
+            if (startIndex >= 0)
+            {
+                // Wytnij tekst od początku array
+                content = content.Substring(startIndex);
+                
+                // Sprawdź czy array jest poprawnie zakończony
+                var endIndex = content.LastIndexOf(']');
+                
+                if (endIndex > 0)
+                {
+                    // Mamy początek i koniec tablicy
+                    content = content.Substring(0, endIndex + 1);
+                }
+                else
+                {
+                    // Nie ma zamykającego nawiasu - musimy go dodać
+                    // Ale najpierw sprawdźmy, czy kończy się przecinkiem
+                    content = content.TrimEnd();
+                    if (content.EndsWith(","))
+                    {
+                        content = content.Substring(0, content.Length - 1);
+                    }
+                    // Dodaj zamykający nawias
+                    content += "]";
+                    _logger.LogWarning("Found incomplete JSON array, adding closing bracket");
+                }
+            }
+        }
+        
+        // Sprawdź, czy JSON zawiera niepełne obiekty
+        try 
+        {
+            // Próba parsowania
+            using var doc = JsonDocument.Parse(content);
+            
+            // Sprawdź czy głównym elementem jest array
+            if (doc.RootElement.ValueKind != JsonValueKind.Array)
+            {
+                _logger.LogWarning("API response is not a JSON array, trying to wrap it");
+                content = $"[{content}]";
+            }
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogWarning(ex, "Failed to validate JSON response, attempting to fix");
+            
+            // Próba naprawy typowych problemów z JSON
+            // 1. Niedomknięty ostatni obiekt
+            if (content.Contains("{") && !content.EndsWith("}]"))
+            {
+                // Liczymy nawiasy
+                int openBraces = content.Count(c => c == '{');
+                int closeBraces = content.Count(c => c == '}');
+                
+                if (openBraces > closeBraces)
+                {
+                    // Brakuje zamykających nawiasów klamrowych
+                    for (int i = 0; i < openBraces - closeBraces; i++)
+                    {
+                        content += "}";
+                    }
+                    
+                    // Dodaj zamykający nawias tablicy, jeśli go nie ma
+                    if (!content.TrimEnd().EndsWith("]"))
+                    {
+                        content += "]";
+                    }
+                    
+                    _logger.LogWarning("Fixed incomplete JSON by adding closing braces");
+                }
+            }
+        }
+        
+        return content;
     }
 } 

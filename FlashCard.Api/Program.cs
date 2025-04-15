@@ -196,8 +196,52 @@ app.MapPost("/api/generations", async (
     dbContext.Generations.Add(generation);
     await dbContext.SaveChangesAsync(cancellationToken);
 
-    var flashcards = JsonSerializer.Deserialize<List<GenerationFlashcardDto>>(responseContent) 
-        ?? throw new Exception("Failed to parse flashcards from API response");
+    List<GenerationFlashcardDto> flashcards;
+    try
+    {
+        // Dodatkowa sanityzacja na wypadek, gdyby OpenApiService nie naprawił wszystkiego
+        //string sanitizedResponse = responseContent.Trim();
+        
+        //// Sprawdź, czy JSON jest poprawny
+        //if (!sanitizedResponse.StartsWith("[") || !sanitizedResponse.EndsWith("]"))
+        //{
+        //    // Znajdź początek tablicy
+        //    var startIndex = sanitizedResponse.IndexOf('[');
+        //    if (startIndex >= 0)
+        //    {
+        //        sanitizedResponse = sanitizedResponse.Substring(startIndex);
+                
+        //        // Sprawdź, czy jest koniec tablicy
+        //        var endIndex = sanitizedResponse.LastIndexOf(']');
+        //        if (endIndex > 0)
+        //        {
+        //            sanitizedResponse = sanitizedResponse.Substring(0, endIndex + 1);
+        //        }
+        //        else
+        //        {
+        //            // Usuń końcowy przecinek, jeśli istnieje
+        //            sanitizedResponse = sanitizedResponse.TrimEnd();
+        //            if (sanitizedResponse.EndsWith(","))
+        //            {
+        //                sanitizedResponse = sanitizedResponse.Substring(0, sanitizedResponse.Length - 1);
+        //            }
+        //            // Dodaj końcowy nawias
+        //            sanitizedResponse += "]";
+        //        }
+        //    }
+        //}
+        
+        flashcards = JsonSerializer.Deserialize<List<GenerationFlashcardDto>>(responseContent,
+            new JsonSerializerOptions { 
+                PropertyNameCaseInsensitive = true,
+                AllowTrailingCommas = true
+            }) 
+            ?? throw new Exception("Failed to parse flashcards from API response");
+    }
+    catch (JsonException ex)
+    {
+        throw new Exception($"Invalid JSON format in API response: {ex.Message}. Response content: {responseContent.Substring(0, Math.Min(200, responseContent.Length))}...");
+    }
 
     generation.GeneratedCount = flashcards.Count;
     await dbContext.SaveChangesAsync(cancellationToken);
@@ -230,6 +274,7 @@ app.MapPost("/api/flashcards/batch", async (
         UserId = userId,
         Front = f.Front,
         Back = f.Back,
+        Source = "generated",
         GenerationId = f.GenerationId ?? throw new ArgumentNullException(nameof(f.GenerationId)),
         CreatedAt = DateTime.UtcNow,
         UpdatedAt = DateTime.UtcNow

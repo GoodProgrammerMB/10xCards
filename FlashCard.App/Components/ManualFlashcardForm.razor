@@ -1,19 +1,20 @@
 @using FlashCard.App.Models
 @using MudBlazor
+@using System.Text.Json
 @inject ISnackbar Snackbar
 
 <MudPaper Class="pa-4">
     <MudText Typo="Typo.h5" Class="mb-4">Dodaj własną fiszkę</MudText>
 
     <MudForm @ref="form" @bind-IsValid="@isValid">
-        <MudTextField @bind-Value="flashcard.Front"
+        <MudTextField @bind-Value="frontText"
                      Label="Pytanie"
                      Lines="3"
                      Required="true"
                      RequiredError="Pytanie jest wymagane"
                      Class="mb-4" />
         
-        <MudTextField @bind-Value="flashcard.Back"
+        <MudTextField @bind-Value="backText"
                      Label="Odpowiedź"
                      Lines="3"
                      Required="true"
@@ -33,6 +34,8 @@
     private MudForm form = null!;
     private bool isValid;
     private GeneratedFlashcard flashcard = new();
+    private string frontText = string.Empty;
+    private string backText = string.Empty;
 
     [Parameter]
     public EventCallback<GeneratedFlashcard> OnFlashcardAdded { get; set; }
@@ -66,14 +69,30 @@
         await form.Validate();
         if (!form.IsValid) return;
 
-        if (string.IsNullOrWhiteSpace(flashcard.Front) || string.IsNullOrWhiteSpace(flashcard.Back))
+        if (string.IsNullOrWhiteSpace(frontText) || string.IsNullOrWhiteSpace(backText))
         {
             Snackbar.Add("Wszystkie pola są wymagane", Severity.Warning);
             return;
         }
 
-        await OnFlashcardAdded.InvokeAsync(flashcard);
-        flashcard = new GeneratedFlashcard();
-        form.Reset();
+        try 
+        {
+            // Tworzymy nową strukturę Front i Back jako obiekty JSON
+            var simpleFront = JsonSerializer.Serialize(new { Word = frontText });
+            var simpleBack = JsonSerializer.Serialize(new { Example_Translation = backText });
+            
+            flashcard.Front = JsonDocument.Parse(simpleFront).RootElement;
+            flashcard.Back = JsonDocument.Parse(simpleBack).RootElement;
+            
+            await OnFlashcardAdded.InvokeAsync(flashcard);
+            flashcard = new GeneratedFlashcard();
+            frontText = string.Empty;
+            backText = string.Empty;
+            form.Reset();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Błąd podczas tworzenia fiszki: {ex.Message}", Severity.Error);
+        }
     }
 } 

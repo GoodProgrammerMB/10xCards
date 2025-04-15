@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FlashCard.Api.Migrations
 {
     [DbContext(typeof(FlashCardDbContext))]
-    [Migration("20250410194212_AddPasswordHashToUsers")]
-    partial class AddPasswordHashToUsers
+    [Migration("20250410194212_UpdateModels")]
+    partial class UpdateModels
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

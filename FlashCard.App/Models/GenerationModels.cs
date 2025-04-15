@@ -1,4 +1,7 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 
 namespace FlashCard.App.Models;
 
@@ -25,12 +28,92 @@ public class GenerationResponseDto
 public class GeneratedFlashcard
 {
     [Required]
-    public string Front { get; set; } = string.Empty;
+    public object Front { get; set; } = new();
     
     [Required]
-    public string Back { get; set; } = string.Empty;
+    public object Back { get; set; } = new();
     
     public int? GenerationId { get; set; }
+    
+    // Pomocnicze właściwości do wyświetlania w UI
+    [JsonIgnore]
+    public string FrontDisplay
+    {
+        get
+        {
+            try
+            {
+                // Obsługa string
+                if (Front is string frontStr)
+                {
+                    return frontStr;
+                }
+                
+                // Obsługa JsonElement
+                if (Front is JsonElement jsonElement)
+                {
+                    // Próba pobrania właściwości Word
+                    if (jsonElement.TryGetProperty("Word", out var word))
+                    {
+                        string wordValue = word.GetString() ?? "";
+                        
+                        // Sprawdź czy mamy też definicję
+                        if (jsonElement.TryGetProperty("Definition", out var definition))
+                        {
+                            string definitionValue = definition.GetString() ?? "";
+                            return wordValue + (string.IsNullOrEmpty(definitionValue) ? "" : " - " + definitionValue);
+                        }
+                        
+                        return wordValue;
+                    }
+                    
+                    // Jeśli nie ma Word, po prostu zwróć jako string
+                    return jsonElement.ToString();
+                }
+                
+                return Front?.ToString() ?? string.Empty;
+            }
+            catch
+            {
+                return Front?.ToString() ?? string.Empty;
+            }
+        }
+    }
+    
+    [JsonIgnore]
+    public string BackDisplay
+    {
+        get
+        {
+            try
+            {
+                // Obsługa string
+                if (Back is string backStr)
+                {
+                    return backStr;
+                }
+                
+                // Obsługa JsonElement
+                if (Back is JsonElement jsonElement)
+                {
+                    // Próba pobrania właściwości Example_Translation
+                    if (jsonElement.TryGetProperty("Example_Translation", out var translation))
+                    {
+                        return translation.GetString() ?? jsonElement.ToString();
+                    }
+                    
+                    // Jeśli nie ma Example_Translation, po prostu zwróć jako string
+                    return jsonElement.ToString();
+                }
+                
+                return Back?.ToString() ?? string.Empty;
+            }
+            catch
+            {
+                return Back?.ToString() ?? string.Empty;
+            }
+        }
+    }
 }
 
 public class BatchSaveRequest

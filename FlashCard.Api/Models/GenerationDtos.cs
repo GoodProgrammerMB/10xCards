@@ -22,11 +22,46 @@ public class GenerationResponseDto
     public DateTime CreatedAt { get; set; }
 }
 
+public class FrontData
+{
+    public string Word { get; set; } = string.Empty;
+    public string Translation { get; set; } = string.Empty;
+    public string Definition { get; set; } = string.Empty;
+    public string Example { get; set; } = string.Empty;
+}
+
+public class BackData
+{
+    public string Example_Translation { get; set; } = string.Empty;
+}
+
 public class GenerationFlashcardDto
 {
     [JsonPropertyName("front")]
-    public string Front { get; set; } = string.Empty;
+    [JsonPropertyOrder(1)]
+    public FrontData Front { get; set; } = new FrontData();
 
     [JsonPropertyName("back")]
-    public string Back { get; set; } = string.Empty;
+    [JsonPropertyOrder(2)]
+    public BackData Back { get; set; } = new BackData();
+
+    // Możesz dodać właściwości pomocnicze, które konwertują obiekty na stringi
+    [JsonIgnore]
+    public string FrontAsString => $"{Front.Word} - {Front.Translation}\n{Front.Definition}\n{Front.Example}";
+
+    [JsonIgnore]
+    public string BackAsString => Back.Example_Translation;
+
+    // Twoje istniejące właściwości pomocnicze można dostosować
+    [JsonIgnore]
+    public string? question { get => FrontAsString; set { } }
+
+    [JsonIgnore]
+    public string? answer { get => BackAsString; set { } }
+
+    [JsonIgnore]
+    public string? term { get => FrontAsString; set { } }
+
+    [JsonIgnore]
+    public string? definition { get => BackAsString; set { } }
 } 

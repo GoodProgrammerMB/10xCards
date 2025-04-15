@@ -5,7 +5,7 @@
 namespace FlashCard.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class AddPasswordHashToUsers : Migration
+    public partial class UpdateModels : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -39,22 +39,6 @@ namespace FlashCard.Api.Migrations
                 table: "GenerationErrorLogs");
 
             migrationBuilder.AddColumn<string>(
-                name: "PasswordHash",
-                table: "Users",
-                type: "nvarchar(255)",
-                maxLength: 255,
-                nullable: false,
-                defaultValue: "");
-
-            migrationBuilder.AddColumn<string>(
-                name: "Username",
-                table: "Users",
-                type: "nvarchar(255)",
-                maxLength: 255,
-                nullable: false,
-                defaultValue: "");
-
-            migrationBuilder.AddColumn<string>(
                 name: "Name",
                 table: "Generations",
                 type: "nvarchar(max)",
@@ -85,7 +69,7 @@ namespace FlashCard.Api.Migrations
                 column: "GenerationId",
                 principalTable: "Generations",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.SetNull);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_GenerationErrorLogs_Generations_GenerationId",
@@ -109,14 +93,6 @@ namespace FlashCard.Api.Migrations
             migrationBuilder.DropIndex(
                 name: "IX_GenerationErrorLogs_GenerationId",
                 table: "GenerationErrorLogs");
-
-            migrationBuilder.DropColumn(
-                name: "PasswordHash",
-                table: "Users");
-
-            migrationBuilder.DropColumn(
-                name: "Username",
-                table: "Users");
 
             migrationBuilder.DropColumn(
                 name: "Name",

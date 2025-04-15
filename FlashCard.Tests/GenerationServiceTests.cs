@@ -41,37 +41,18 @@ public class GenerationServiceTests
     
     private FlashCardDbContext CreateMockDbContext()
     {
-        // Tworzymy mocki DbSet dla Generations i GenerationErrorLogs
-        var generationsData = new List<Generation>().AsQueryable();
-        var errorLogsData = new List<GenerationErrorLog>().AsQueryable();
-        
-        var generationsDbSetMock = new Mock<DbSet<Generation>>();
-        var errorLogsDbSetMock = new Mock<DbSet<GenerationErrorLog>>();
-        
-        // Konfiguracja mockowanych DbSet
-        generationsDbSetMock.As<IQueryable<Generation>>().Setup(m => m.Provider).Returns(generationsData.Provider);
-        generationsDbSetMock.As<IQueryable<Generation>>().Setup(m => m.Expression).Returns(generationsData.Expression);
-        generationsDbSetMock.As<IQueryable<Generation>>().Setup(m => m.ElementType).Returns(generationsData.ElementType);
-        generationsDbSetMock.As<IQueryable<Generation>>().Setup(m => m.GetEnumerator()).Returns(generationsData.GetEnumerator());
-        generationsDbSetMock.Setup(m => m.Add(It.IsAny<Generation>())).Callback<Generation>(generations => { });
-        
-        errorLogsDbSetMock.As<IQueryable<GenerationErrorLog>>().Setup(m => m.Provider).Returns(errorLogsData.Provider);
-        errorLogsDbSetMock.As<IQueryable<GenerationErrorLog>>().Setup(m => m.Expression).Returns(errorLogsData.Expression);
-        errorLogsDbSetMock.As<IQueryable<GenerationErrorLog>>().Setup(m => m.ElementType).Returns(errorLogsData.ElementType);
-        errorLogsDbSetMock.As<IQueryable<GenerationErrorLog>>().Setup(m => m.GetEnumerator()).Returns(errorLogsData.GetEnumerator());
-        errorLogsDbSetMock.Setup(m => m.Add(It.IsAny<GenerationErrorLog>())).Callback<GenerationErrorLog>(errorLog => { });
-        
-        // Tworzenie mocka DbContext używając testowej DbContextOptions
+        // Używamy prawdziwego kontekstu bazy danych w pamięci zamiast mocka
         var options = new DbContextOptionsBuilder<FlashCardDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
         
-        var mockDbContext = new Mock<FlashCardDbContext>(options);
-        mockDbContext.Setup(db => db.Generations).Returns(generationsDbSetMock.Object);
-        mockDbContext.Setup(db => db.GenerationErrorLogs).Returns(errorLogsDbSetMock.Object);
-        mockDbContext.Setup(db => db.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+        var dbContext = new FlashCardDbContext(options);
         
-        return mockDbContext.Object;
+        // Upewniamy się, że baza danych jest pusta
+        dbContext.Database.EnsureDeleted();
+        dbContext.Database.EnsureCreated();
+        
+        return dbContext;
     }
     
     [Fact]
@@ -85,7 +66,8 @@ public class GenerationServiceTests
             Model = "test-model"
         };
         
-        const string jsonResponse = @"{""choices"":[{""message"":{""content"":""[{""front"":""Test Question"",""back"":""Test Answer""}]""}}]}";
+        // Symuluje odpowiedź API z uwzględnieniem nowego formatu JSON
+        const string jsonResponse = @"{""choices"":[{""message"":{""content"":""[{""front"":""Test Question"",""back"":""Test Answer""},{""front"":""Second Question"",""back"":""Second Answer""}]""}}]}";
         var httpResponse = new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,
@@ -111,9 +93,11 @@ public class GenerationServiceTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(userId, result.UserId);
-        Assert.Single(result.Flashcards);
-        Assert.Equal("Test Question", result.Flashcards[0].Front);
-        Assert.Equal("Test Answer", result.Flashcards[0].Back);
+        Assert.Equal(2, result.Flashcards.Count);
+        Assert.Equal("Test Question", result.Flashcards[0].Front.ToString());
+        Assert.Equal("Test Answer", result.Flashcards[0].Back.ToString());
+        Assert.Equal("Second Question", result.Flashcards[1].Front.ToString());
+        Assert.Equal("Second Answer", result.Flashcards[1].Back.ToString());
     }
     
     [Fact]

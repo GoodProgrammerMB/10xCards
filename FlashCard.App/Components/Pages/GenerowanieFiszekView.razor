@@ -55,8 +55,8 @@
                     <MudListItem T="GeneratedFlashcard" Value="@flashcard">
                         <MudCard>
                             <MudCardContent>
-                                <MudText Typo="Typo.body1"><strong>Pytanie:</strong> @flashcard.Front</MudText>
-                                <MudText Typo="Typo.body1"><strong>Odpowiedź:</strong> @flashcard.Back</MudText>
+                                <MudText Typo="Typo.body1"><strong>Pytanie:</strong> @flashcard.FrontDisplay</MudText>
+                                <MudText Typo="Typo.body1"><strong>Odpowiedź:</strong> @flashcard.BackDisplay</MudText>
                             </MudCardContent>
                             <MudCardActions>
                                 <MudButton OnClick="@(() => EditFlashcard(flashcard))">Edytuj</MudButton>
