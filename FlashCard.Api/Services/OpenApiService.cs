@@ -35,10 +35,7 @@ public class OpenApiService : IOpenApiService
     public string DefaultModelName { get; }
     public IReadOnlyDictionary<string, object> DefaultParameters => _defaultParameters;
 
-    public OpenApiService(
-        HttpClient httpClient,
-        IConfiguration configuration,
-        ILogger<OpenApiService> logger)
+    public OpenApiService(HttpClient httpClient, IConfiguration configuration, ILogger<OpenApiService> logger)
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
