@@ -19,6 +19,7 @@
                                 For="@(() => loginModel.Email)"
                                 Required="true"
                                 RequiredError="Email jest wymagany"
+                                  Variant="Variant.Outlined"
                                 Class="mb-4" />
 
                     <MudTextField T="string"
@@ -28,6 +29,7 @@
                                 Required="true"
                                 RequiredError="Hasło jest wymagane"
                                 InputType="InputType.Password"
+                                  Variant="Variant.Outlined"
                                 Class="mb-4" />
 
                     <MudCheckBox @bind-Checked="loginModel.RememberMe"
@@ -67,6 +69,7 @@
                                 For="@(() => registerModel.Email)"
                                 Required="true"
                                 RequiredError="Email jest wymagany"
+                                  Variant="Variant.Outlined"
                                 Class="mb-4" />
 
                     <MudTextField T="string"
@@ -76,6 +79,7 @@
                                 Required="true"
                                 RequiredError="Hasło jest wymagane"
                                 InputType="InputType.Password"
+                                  Variant="Variant.Outlined"
                                 Class="mb-4" />
 
                     <MudTextField T="string"
@@ -85,6 +89,7 @@
                                 Required="true"
                                 RequiredError="Potwierdzenie hasła jest wymagane"
                                 InputType="InputType.Password"
+                                  Variant="Variant.Outlined"
                                 Class="mb-4" />
 
                     @if (!string.IsNullOrEmpty(registerError))
@@ -92,11 +97,12 @@
                         <MudAlert Severity="Severity.Error" Class="mb-4">@registerError</MudAlert>
                     }
 
-                    <MudButton Variant="Variant.Filled"
+                    <MudButton
                              Color="Color.Primary"
                              OnClick="HandleRegister"
                              FullWidth="true"
                              Size="Size.Large"
+                               Variant="Variant.Outlined"
                              Class="mb-4">
                         @if (isRegisterLoading)
                         {
