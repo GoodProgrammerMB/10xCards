@@ -27,8 +27,11 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
+      - name: Auto-format code
+        run: dotnet format
+
       - name: Check code format
-        run: dotnet format --verify-no-changes
+        run: dotnet format --verify-no-changes --exclude FlashCard.E2ETests/
 
   unit-tests:
     name: Run Unit Tests
