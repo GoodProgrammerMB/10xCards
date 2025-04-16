@@ -66,8 +66,19 @@ public class GenerationServiceTests
             Model = "test-model"
         };
         
-        // Symuluje odpowiedź API z uwzględnieniem nowego formatu JSON
-        const string jsonResponse = @"{""choices"":[{""message"":{""content"":""[{""front"":""Test Question"",""back"":""Test Answer""},{""front"":""Second Question"",""back"":""Second Answer""}]""}}]}";
+        // Poprawiony format JSON z odpowiednimi obiektami dla FrontData i BackData
+        var jsonResponse = """
+        {
+          "choices": [
+            {
+              "message": {
+                "content": "[{\"front\":{\"word\":\"Test Question\",\"translation\":\"\",\"definition\":\"\",\"example\":\"\"},\"back\":{\"example_Translation\":\"Test Answer\"}},{\"front\":{\"word\":\"Second Question\",\"translation\":\"\",\"definition\":\"\",\"example\":\"\"},\"back\":{\"example_Translation\":\"Second Answer\"}}]"
+              }
+            }
+          ]
+        }
+        """;
+        
         var httpResponse = new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,
@@ -94,10 +105,10 @@ public class GenerationServiceTests
         Assert.NotNull(result);
         Assert.Equal(userId, result.UserId);
         Assert.Equal(2, result.Flashcards.Count);
-        Assert.Equal("Test Question", result.Flashcards[0].Front.ToString());
-        Assert.Equal("Test Answer", result.Flashcards[0].Back.ToString());
-        Assert.Equal("Second Question", result.Flashcards[1].Front.ToString());
-        Assert.Equal("Second Answer", result.Flashcards[1].Back.ToString());
+        Assert.Equal("Test Question", result.Flashcards[0].Front.Word);
+        Assert.Equal("Test Answer", result.Flashcards[0].Back.Example_Translation);
+        Assert.Equal("Second Question", result.Flashcards[1].Front.Word);
+        Assert.Equal("Second Answer", result.Flashcards[1].Back.Example_Translation);
     }
     
     [Fact]
