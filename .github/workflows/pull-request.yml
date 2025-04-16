@@ -22,7 +22,10 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4.3.1
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: |
+            8.0.x
+            9.0.100-preview.5.24296.9
+          dotnet-quality: 'preview'
 
       - name: Restore dependencies
         run: dotnet restore
@@ -41,7 +44,10 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4.3.1
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: |
+            8.0.x
+            9.0.100-preview.5.24296.9
+          dotnet-quality: 'preview'
 
       - name: Restore dependencies
         run: dotnet restore
