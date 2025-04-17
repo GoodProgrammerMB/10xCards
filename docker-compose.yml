@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: 10xcards-api
+    ports:
+      - "5170:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - OpenRouter__ApiKey=${OPENROUTER_API_KEY}
+      - ConnectionStrings__DefaultConnection=Server=db;Database=FlashCardDb;User ID=sa;Password=${DB_PASSWORD};TrustServerCertificate=True;MultipleActiveResultSets=true
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - 10xcards-network
+    healthcheck:
+      test: curl -f http://localhost:8080/swagger || exit 1
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.blazor
+    container_name: 10xcards-blazor
+    ports:
+      - "7174:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ApiBaseUrl=http://api:8080
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - 10xcards-network
+    healthcheck:
+      test: curl -f http://localhost:80/health || exit 1
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: 10xcards-db
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${DB_PASSWORD}
+      - MSSQL_PID=Express
+      - TZ=Europe/Warsaw
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql-data:/var/opt/mssql
+    restart: unless-stopped
+    networks:
+      - 10xcards-network
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${DB_PASSWORD} -Q "SELECT 1" -b -o /dev/null
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+
+networks:
+  10xcards-network:
+    driver: bridge
+
+volumes:
+  mssql-data:

@@ -47,7 +47,13 @@ public class GenerationFlashcardDto
 
     // Możesz dodać właściwości pomocnicze, które konwertują obiekty na stringi
     [JsonIgnore]
-    public string FrontAsString => $"{Front.Word} - {Front.Translation}\n{Front.Definition}\n{Front.Example}";
+    public string FrontAsString
+    {
+        get
+        {
+            return $"{Front.Translation} - {Front.Word}\n{Front.Definition}\n{Front.Example}";
+        }
+    }
 
     [JsonIgnore]
     public string BackAsString => Back.Example_Translation;

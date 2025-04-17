@@ -36,8 +36,8 @@
     protected override void OnInitialized()
     {
         // Inicjalizacja tekstów z właściwości pomocniczych
-        frontText = Flashcard.FrontDisplay;
-        backText = Flashcard.BackDisplay;
+        frontText = FormatJsonString(Flashcard.FrontDisplay);
+        backText = FormatJsonString(Flashcard.BackDisplay);
         
         editedFlashcard = new GeneratedFlashcard
         {
@@ -70,6 +70,23 @@
         {
             Snackbar.Add($"Błąd podczas zapisywania fiszki: {ex.Message}", Severity.Error);
         }
+    }
+
+    public static string FormatJsonString(string input)
+    {
+        // Usuń białe znaki na początku i końcu
+        input = input.Trim();
+
+        // Usuń pierwszy '{' i ostatni '}'
+        if (input.StartsWith("{") && input.EndsWith("}"))
+        {
+            input = input.Substring(1, input.Length - 2);
+        }
+
+        // Zamień przecinki na nowe linie
+        input = input.Replace(",", Environment.NewLine);
+
+        return input;
     }
 
     private void Cancel() => MudDialog.Cancel();

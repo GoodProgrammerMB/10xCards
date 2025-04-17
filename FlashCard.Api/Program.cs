@@ -123,13 +123,13 @@ if (validationResult.Failed)
 }
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseCors("AllowBlazorApp");
 app.UseAuthentication();
 app.UseAuthorization();
@@ -305,5 +305,11 @@ app.MapPost("/api/flashcards/batch", async (
 })
 .RequireAuthorization()
 .WithName("SaveFlashcardsBatch");
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<FlashCardDbContext>(); 
+    dbContext.Database.Migrate();
+}
 
 app.Run();

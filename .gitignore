@@ -14,6 +14,7 @@
 *.userosscache
 *.userprefs
 *.sln.docstates
+*.env
 
 # Ignorowanie wyników testów (np. katalog TestResults generowany przez Visual Studio)
 [Tt]est[Rr]esult*/

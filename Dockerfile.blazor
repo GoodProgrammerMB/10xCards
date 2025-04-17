@@ -1,0 +1,45 @@
+# Stage 1: Build
+FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
+WORKDIR /source
+
+# Copy project files and restore dependencies
+COPY FlashCard.App/FlashCard.App.csproj ./FlashCard.App/
+RUN dotnet restore "FlashCard.App/FlashCard.App.csproj" --use-current-runtime
+
+# Copy the rest of the source code
+COPY . .
+
+# Publish the application
+RUN dotnet publish "FlashCard.App/FlashCard.App.csproj" -c Release -o /app/publish --no-restore --use-current-runtime /p:UseAppHost=false
+
+# Stage 2: Runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS final
+WORKDIR /app
+
+# Install globalization packages
+RUN apk add --no-cache icu-libs curl
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+ENV LC_ALL=en_US.UTF-8
+ENV LANG=en_US.UTF-8
+
+# Create appuser
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN chown -R appuser:appgroup /app
+
+# Copy published app
+COPY --chown=appuser:appgroup --from=build /app/publish ./
+
+# Switch to appuser
+USER appuser
+
+# Set environment variables
+ENV ASPNETCORE_ENVIRONMENT=Production
+ENV ASPNETCORE_URLS=http://0.0.0.0:80
+
+EXPOSE 80
+
+# Health Check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:80/health || exit 1
+
+ENTRYPOINT ["dotnet", "FlashCard.App.dll"] 

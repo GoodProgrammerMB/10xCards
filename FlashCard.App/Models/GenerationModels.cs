@@ -32,7 +32,11 @@ public class GeneratedFlashcard
     
     [Required]
     public object Back { get; set; } = new();
-    
+
+    public string FrontAsString { get; set; }
+    public string BackAsString { get; set; }
+
+
     public int? GenerationId { get; set; }
     
     // Pomocnicze właściwości do wyświetlania w UI
@@ -41,6 +45,7 @@ public class GeneratedFlashcard
     {
         get
         {
+            //return $"{Front.Translation} - {Front.Word}\n{Front.Definition}\n{Front.Example}";
             try
             {
                 // Obsługa string

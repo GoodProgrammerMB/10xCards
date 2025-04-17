@@ -7,6 +7,12 @@
 @inject IDialogService DialogService
 @attribute [Authorize]
 
+<style>
+    .mud-card-actions {
+        justify-content: space-evenly;
+    }
+</style>
+
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
     <MudText Typo="Typo.h4" Class="mb-4">Moje fiszki</MudText>
 
@@ -29,21 +35,23 @@
                     <MudCard>
                         <MudCardContent>
                             <MudText Typo="Typo.subtitle1">Przód</MudText>
-                            <MudText Class="mb-4">@flashcard.Front</MudText>
+                            <MudText Class="mb-4">@((MarkupString)FormatJsonString(flashcard.Front))</MudText>
                             
                             <MudDivider Class="my-2"/>
                             
                             <MudText Typo="Typo.subtitle1" Class="mt-2 mb-2">Tył</MudText>
-                            <MudText>@flashcard.Back</MudText>
+                            <MudText>@((MarkupString)FormatJsonString(flashcard.Back))</MudText>
                         </MudCardContent>
                         <MudCardActions>
                             <MudButton StartIcon="@Icons.Material.Filled.Edit"
                                      Color="Color.Primary"
+                                       Variant="Variant.Filled"
                                      OnClick="@(() => EditFlashcard(flashcard))">
                                 Edytuj
                             </MudButton>
                             <MudButton StartIcon="@Icons.Material.Filled.Delete"
                                      Color="Color.Error"
+                                       Variant="Variant.Filled"
                                      OnClick="@(() => DeleteFlashcard(flashcard))">
                                 Usuń
                             </MudButton>
@@ -79,6 +87,24 @@
         {
             isLoading = false;
         }
+    }
+    public static string FormatJsonString(string input)
+    {
+        // Usuń białe znaki na początku i końcu
+        input = input.Trim();
+
+        // Usuń pierwszy '{' i ostatni '}'
+        if (input.StartsWith("{") && input.EndsWith("}"))
+        {
+            input = input.Substring(1, input.Length - 2);
+        }
+
+        // Zamień przecinki na nowe linie
+        input = input.Replace(",", "<br/>");
+        input = input.Replace("\"", "");
+        input = input.Replace("example_Translation:", "");
+
+        return input;
     }
 
     private async Task EditFlashcard(Flashcard flashcard)
