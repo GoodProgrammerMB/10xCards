@@ -33,10 +33,6 @@ public class GeneratedFlashcard
     [Required]
     public object Back { get; set; } = new();
 
-    public string FrontAsString { get; set; }
-    public string BackAsString { get; set; }
-
-
     public int? GenerationId { get; set; }
     
     // Pomocnicze właściwości do wyświetlania w UI

@@ -96,41 +96,38 @@
         if (!isLoginValid) return;
 
         isLoginLoading = true;
-        loginError = null;
+        loginError = string.Empty;
 
         try
         {
             var result = await AuthService.LoginAsync(loginModel);
-            if (result.Successful)
+            if (result.Successful && result.Token != null)
             {
                 await Task.Delay(100);
                 var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-                if (authState.User.Identity is not null)
+                var identity = authState.User.Identity;
+                
+                if (identity != null && identity.IsAuthenticated)
                 {
-                    if (authState.User.Identity.IsAuthenticated)
-                    {
-                        NavigationManager.NavigateTo("/");
-                    }
-                    else
-                    {
-                        loginError = "Błąd uwierzytelniania - token został zapisany, ale użytkownik nie jest uwierzytelniony.";
-                        ((ApiAuthenticationStateProvider)AuthStateProvider).NotifyUserAuthentication(result.Token!);
-                        await Task.Delay(100);
-                        authState = await AuthStateProvider.GetAuthenticationStateAsync();
-                        if (authState.User.Identity.IsAuthenticated)
-                        {
-                            NavigationManager.NavigateTo("/");
-                        }
-                    }
+                    NavigationManager.NavigateTo("/");
                 }
                 else
                 {
-                    loginError = "Błąd uwierzytelniania - brak tożsamości użytkownika.";
+                    loginError = "Błąd uwierzytelniania - token został zapisany, ale użytkownik nie jest uwierzytelniony.";
+                    ((ApiAuthenticationStateProvider)AuthStateProvider).NotifyUserAuthentication(result.Token);
+                    await Task.Delay(100);
+                    authState = await AuthStateProvider.GetAuthenticationStateAsync();
+                    identity = authState.User.Identity;
+                    
+                    if (identity != null && identity.IsAuthenticated)
+                    {
+                        NavigationManager.NavigateTo("/");
+                    }
                 }
             }
             else
             {
-                loginError = result.Error;
+                loginError = result.Error ?? "Nieznany błąd podczas logowania";
             }
         }
         catch (Exception ex)
@@ -149,7 +146,7 @@
             return "Hasło jest wymagane";
         if (password.Length < 6)
             return "Hasło musi mieć co najmniej 6 znaków";
-        return null;
+        return string.Empty;
     }
 
     private string ValidateConfirmPassword(string confirmPassword)
@@ -158,7 +155,7 @@
             return "Potwierdzenie hasła jest wymagane";
         if (confirmPassword != registerModel.Password)
             return "Hasła nie są identyczne";
-        return null;
+        return string.Empty;
     }
 
     private async Task HandleRegister()

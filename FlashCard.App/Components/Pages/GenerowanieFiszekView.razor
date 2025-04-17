@@ -21,10 +21,10 @@
                          MaxLength="10000" />
             <MudSelect @bind-Value="request.Model" Label="Model" Required="true" RequiredError="Model jest wymagany">
                 <MudSelectItem Value="@("gpt-4")">GPT-4</MudSelectItem>
-                <MudSelectItem Value="@("gpt-4-turbo")">GPT-4 Turbo</MudSelectItem>
+              @*   <MudSelectItem Value="@("gpt-4-turbo")">GPT-4 Turbo</MudSelectItem>
                 <MudSelectItem Value="@("gpt-4-vision-preview")">GPT-4 Vision</MudSelectItem>
                 <MudSelectItem Value="@("gpt-3.5-turbo")">GPT-3.5 Turbo</MudSelectItem>
-                <MudSelectItem Value="@("gpt-3.5-turbo-16k")">GPT-3.5 Turbo 16K</MudSelectItem>
+                <MudSelectItem Value="@("gpt-3.5-turbo-16k")">GPT-3.5 Turbo 16K</MudSelectItem> *@
             </MudSelect>
             <MudButton Color="Color.Primary" OnClick="GenerateFlashcards" Class="mt-4" Disabled="@isLoading">
                 @if (isLoading)

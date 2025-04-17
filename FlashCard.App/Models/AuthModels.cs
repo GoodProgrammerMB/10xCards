@@ -28,7 +28,7 @@ public class RegisterModel
 
     [DataType(DataType.Password)]
     [Compare("Password", ErrorMessage = "Hasła nie są identyczne.")]
-    public string ConfirmPassword { get; set; }
+    public string ConfirmPassword { get; set; } = string.Empty;
 }
 
 public class AuthResponse
