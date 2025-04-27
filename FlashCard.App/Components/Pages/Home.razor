@@ -1,13 +1,14 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
+@inject IJSRuntime JSRuntime
 
 <PageTitle>Strona główna</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
     <MudCard Outlined="true">
         <MudCardHeader>
-            <MudText Typo="Typo.h4">Witaj w aplikacji do nauki z fiszkami!</MudText>
+            <MudText Typo="Typo.body1">@((MarkupString)text)</MudText>
         </MudCardHeader>
         <MudCardContent>
             <MudText Typo="Typo.body1">
@@ -20,4 +21,95 @@
             </MudList>
         </MudCardContent>
     </MudCard>
+    <MudCard Class="mt-4">
+        <MudCardContent>
+            <MudText Typo="Typo.h5" GutterBottom="true">Przykładowy Prompt</MudText>
+            <MudText Typo="Typo.body1">
+                Jesteś doświadczonym nauczycielem języka angielskiego oraz ekspertem w tworzeniu fiszek edukacyjnych.
+                Twoim zadaniem jest wygenerowanie zestawu dokładnie 2 fiszek do nauki angielskiego dla ucznia na 
+                poziomie A2/B1.
+            </MudText>
+            <MudText Typo="Typo.subtitle1" Class="mt-3">Szczegóły:</MudText>
+            <MudList Dense="true">
+                <MudListItem>Każda fiszka powinna dotyczyć innego, losowo wybranego zagadnienia życia codziennego.</MudListItem>
+                <MudListItem>Za każdym razem wylosuj nową kategorię i nowe słowo lub wyrażenie.</MudListItem>
+                <MudListItem>Nie używaj ponownie słów z poprzednich zestawów.</MudListItem>
+            </MudList>
+            <MudText Typo="Typo.subtitle1" Class="mt-3">Struktura fiszki:</MudText>
+            <MudList Dense="true">
+                <MudListItem>Angielskie słowo lub krótkie wyrażenie (1–3 wyrazy).</MudListItem>
+                <MudListItem>Polskie tłumaczenie.</MudListItem>
+                <MudListItem>Krótką definicję po angielsku, dostosowaną do poziomu A2/B1.</MudListItem>
+                <MudListItem>Przykład użycia słowa w zdaniu po angielsku.</MudListItem>
+                <MudListItem>Polskie tłumaczenie tego zdania.</MudListItem>
+            </MudList>
+            <MudText Typo="Typo.subtitle1" Class="mt-3">Zasady:</MudText>
+            <MudList Dense="true">
+                <MudListItem>Wybieraj słowa użyteczne w codziennych rozmowach.</MudListItem>
+                <MudListItem>Unikaj zaawansowanych lub rzadkich słów (utrzymaj poziom A2/B1).</MudListItem>
+                <MudListItem>Unikaj skrótów, slangu, kolokwializmów.</MudListItem>
+                <MudListItem>Dbaj o poprawność gramatyczną i stylistyczną.</MudListItem>
+                <MudListItem>Losowo uwzględniaj rzeczowniki, czasowniki, przymiotniki, proste idiomy.</MudListItem>
+            </MudList>
+            <MudText Typo="Typo.caption" Class="mt-3">Wynik przedstaw jako listę JSON w tym formacie:</MudText>
+            <MudCodeHighlight Language="json">
+[
+  {
+    "word": "example",
+    "translation": "przykład",
+    "definition": "Something that shows or explains a situation.",
+    "example": "This is an example of a good idea.",
+    "example_translation": "To jest przykład dobrego pomysłu."
+  }
+]
+            </MudCodeHighlight>
+            <MudButton Class="mt-3" Variant="Variant.Filled" OnClick="CopyToClipboard">Skopiuj Prompt</MudButton>
+        </MudCardContent>
+    </MudCard>
 </MudContainer>
+
+@code{
+    string text = @"Nasza aplikacja do nauki fiszek wykorzystuje sztuczną inteligencję do automatycznego generowania nowych fiszek na podstawie ustalonych tematów i poziomu trudności. <br/>
+                Każdego dnia użytkownik otrzymuje pięć nowych fiszek do nauki, co pozwala na systematyczny i nieprzeciążający rozwój słownictwa. <br />
+                System inteligentnych powtórek automatycznie przypomina o przerobionych fiszkach, dodając do codziennej nauki dwie fiszki sprzed tygodnia.<br/>
+                Dzięki temu po tygodniu codzienna sesja składa się z siedmiu fiszek: pięciu nowych oraz dwóch powtarzanych. Aplikacja zapewnia stały postęp, utrwalenie wiedzy i przyjemny rytm nauki dopasowany do codziennego życia użytkownika.";
+
+    private async Task CopyToClipboard()
+    {
+        var promptContent = @"
+Jesteś doświadczonym nauczycielem języka angielskiego oraz ekspertem w tworzeniu fiszek edukacyjnych. 
+Twoim zadaniem jest wygenerowanie zestawu dokładnie 2 fiszek do nauki angielskiego dla ucznia na poziomie A2/B1.
+
+Każda fiszka powinna dotyczyć innego, losowo wybranego zagadnienia życia codziennego (np. zakupy, dom, jedzenie, podróże, hobby, szkoła, zdrowie, czas wolny).
+
+Ważne: Za każdym razem wylosuj nową kategorię i nowe słowo lub wyrażenie. Nie używaj ponownie słów z poprzednich zestawów (np. 'borrow', 'grocery store').
+
+Każda fiszka powinna zawierać:
+- Angielskie słowo lub krótkie wyrażenie (1–3 wyrazy).
+- Polskie tłumaczenie.
+- Krótką definicję po angielsku, dostosowaną do poziomu A2/B1 (łatwe słownictwo, prosty język).
+- Przykład użycia słowa w zdaniu po angielsku.
+- Polskie tłumaczenie tego zdania.
+
+Dodatkowe zasady:
+- Wybieraj słowa użyteczne w codziennych rozmowach.
+- Unikaj zaawansowanych lub rzadkich słów (utrzymaj poziom A2/B1).
+- Unikaj skrótów, slangu, kolokwializmów.
+- Dbaj o poprawność gramatyczną i stylistyczną.
+- Losowo uwzględniaj rzeczowniki, czasowniki, przymiotniki, proste idiomy.
+
+Wynik przedstaw jako listę JSON w tym formacie:
+
+[
+  {
+    'word': 'example',
+    'translation': 'przykład',
+    'definition': 'Something that shows or explains a situation.',
+    'example': 'This is an example of a good idea.',
+    'example_translation': 'To jest przykład dobrego pomysłu.'
+  }
+]
+        ";
+        await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", promptContent);
+    }
+}

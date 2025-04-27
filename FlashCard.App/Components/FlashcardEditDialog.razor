@@ -1,7 +1,12 @@
 @using FlashCard.App.Models
 @using System.Text.Json
 @inject ISnackbar Snackbar
-
+<style>
+    .mud-dialog-width-lg {
+        max-width: 1280px;
+        min-width: 600px;
+    }
+</style>
 <MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6">Edytuj fiszkę</MudText>
@@ -27,24 +32,31 @@
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
-    [Parameter] public GeneratedFlashcard Flashcard { get; set; } = null!;
+    [Parameter] public object Flashcard { get; set; } = null!;
     
-    private GeneratedFlashcard editedFlashcard = new();
     private string frontText = string.Empty;
     private string backText = string.Empty;
+    private bool isGeneratedFlashcard = false;
+    private bool isNormalFlashcard = false;
 
     protected override void OnInitialized()
     {
-        // Inicjalizacja tekstów z właściwości pomocniczych
-        frontText = FormatJsonString(Flashcard.FrontDisplay);
-        backText = FormatJsonString(Flashcard.BackDisplay);
+        isGeneratedFlashcard = Flashcard is GeneratedFlashcard;
+        // Musimy używać GetType zamiast pattern matching, by uniknąć problemu z castowaniem
+        isNormalFlashcard = Flashcard.GetType() == typeof(Flashcard);
         
-        editedFlashcard = new GeneratedFlashcard
+        if (isGeneratedFlashcard)
         {
-            Front = Flashcard.Front,
-            Back = Flashcard.Back,
-            GenerationId = Flashcard.GenerationId
-        };
+            var genFlashcard = (GeneratedFlashcard)Flashcard;
+            frontText = FlashcardFormatter.FormatFlashcard(genFlashcard.FrontDisplay);
+            backText = FlashcardFormatter.FormatExampleTranslation(genFlashcard.BackDisplay);
+        }
+        else if (isNormalFlashcard)
+        {
+            var flashcard = (Flashcard)Flashcard;
+            frontText = flashcard.Front;
+            backText = flashcard.Back;
+        }
     }
 
     private void Submit()
@@ -55,16 +67,39 @@
             return;
         }
         
-        // Tworzymy nową uproszczoną strukturę Front i Back
         try 
         {
-            var simpleFront = JsonSerializer.Serialize(new { Word = frontText });
-            var simpleBack = JsonSerializer.Serialize(new { Example_Translation = backText });
-            
-            editedFlashcard.Front = JsonDocument.Parse(simpleFront).RootElement;
-            editedFlashcard.Back = JsonDocument.Parse(simpleBack).RootElement;
-
-            MudDialog.Close(DialogResult.Ok(editedFlashcard));
+            if (isGeneratedFlashcard)
+            {
+                var genFlashcard = (GeneratedFlashcard)Flashcard;
+                var editedFlashcard = new GeneratedFlashcard
+                {
+                    GenerationId = genFlashcard.GenerationId
+                };
+                
+                var simpleFront = JsonSerializer.Serialize(new { Word = frontText });
+                var simpleBack = JsonSerializer.Serialize(new { Example_Translation = backText });
+                
+                editedFlashcard.Front = JsonDocument.Parse(simpleFront).RootElement;
+                editedFlashcard.Back = JsonDocument.Parse(simpleBack).RootElement;
+                
+                MudDialog.Close(DialogResult.Ok(editedFlashcard));
+            }
+            else if (isNormalFlashcard)
+            {
+                var flashcard = (Flashcard)Flashcard;
+                var editedFlashcard = new Flashcard
+                {
+                    Id = flashcard.Id,
+                    Front = frontText,
+                    Back = backText,
+                    Source = flashcard.Source,
+                    Accepted = flashcard.Accepted,
+                    TemporaryId = flashcard.TemporaryId
+                };
+                
+                MudDialog.Close(DialogResult.Ok(editedFlashcard));
+            }
         }
         catch (Exception ex)
         {
@@ -72,22 +107,19 @@
         }
     }
 
-    public static string FormatJsonString(string input)
+    private void Cancel() => MudDialog.Cancel();
+
+    public class FlashcardModel
     {
-        // Usuń białe znaki na początku i końcu
-        input = input.Trim();
-
-        // Usuń pierwszy '{' i ostatni '}'
-        if (input.StartsWith("{") && input.EndsWith("}"))
-        {
-            input = input.Substring(1, input.Length - 2);
-        }
-
-        // Zamień przecinki na nowe linie
-        input = input.Replace(",", Environment.NewLine);
-
-        return input;
+        public string Word { get; set; } = string.Empty;
+        public string Translation { get; set; } = string.Empty;
+        public string Definition { get; set; } = string.Empty;
+        public string Example { get; set; } = string.Empty;
     }
 
-    private void Cancel() => MudDialog.Cancel();
+    public class ExampleTranslationModel
+    {
+        public string Example_Translation { get; set; } = string.Empty;
+    }
 } 
+

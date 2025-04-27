@@ -16,13 +16,14 @@
 <AuthorizeView>
     <Authorized>
         <MudLayout>
-            <MudAppBar style="display: flex; align-items:end">
+            <MudAppBar style="display: flex; align-items: stretch;">
+                <img src="logo.png" alt="Logo aplikacji" style="max-height: 40px; margin-right: 10px;" />
                 <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
+                <MudSpacer />
                 <div style="display: flex; gap: 5px; justify-content:center; align-items:center">
                     <MudAvatar Color="Color.Inherit">@user.FirstOrDefault()</MudAvatar>
                     <span><strong>@user</strong></span>
                 </div>
-                <MudSpacer />
                 <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" OnClick="Logout" />
             </MudAppBar>
 

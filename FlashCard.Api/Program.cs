@@ -108,6 +108,7 @@ builder.Services.AddHttpClient<IOpenApiService, OpenApiService>(client =>
 builder.Services.AddScoped<IOpenApiService, OpenApiService>();
 builder.Services.AddHttpClient<IGenerationService, GenerationService>();
 builder.Services.AddScoped<IGenerationService, GenerationService>();
+builder.Services.AddScoped<ILearningService, LearningService>();
 
 var app = builder.Build();
 

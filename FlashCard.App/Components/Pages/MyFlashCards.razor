@@ -35,12 +35,12 @@
                     <MudCard>
                         <MudCardContent>
                             <MudText Typo="Typo.subtitle1">Przód</MudText>
-                            <MudText Class="mb-4">@((MarkupString)FormatJsonString(flashcard.Front))</MudText>
+                            <MudText Class="mb-4">@((MarkupString)FlashcardFormatter.FormatFlashcard(flashcard.Front))</MudText>
                             
                             <MudDivider Class="my-2"/>
                             
                             <MudText Typo="Typo.subtitle1" Class="mt-2 mb-2">Tył</MudText>
-                            <MudText>@((MarkupString)FormatJsonString(flashcard.Back))</MudText>
+                            <MudText>@((MarkupString)FlashcardFormatter.FormatExampleTranslation(flashcard.Back))</MudText>
                         </MudCardContent>
                         <MudCardActions>
                             <MudButton StartIcon="@Icons.Material.Filled.Edit"

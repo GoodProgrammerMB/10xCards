@@ -2,15 +2,170 @@
 @using FlashCard.App.Models
 @using FlashCard.App.Services
 @using Microsoft.AspNetCore.Authorization
+@using System.Text.RegularExpressions
+@using System.Text.Json
 @inject IFlashcardService FlashcardService
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
 @attribute [Authorize]
 
-<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
-    <MudText Typo="Typo.h4" Class="mb-4">Nauka</MudText>
-    </MudContainer>
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
+    <MudText Typo="Typo.h4" Class="mb-4">Sesja Nauki</MudText>
+
+    @if (_isLoading)
+    {
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+    }
+    else if (_sessionFinished)
+    {
+        <MudAlert Severity="Severity.Success">Sesja nauki zakończona! Gratulacje!</MudAlert>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="StartNewSession" Class="mt-4">Rozpocznij nową sesję</MudButton>
+    }
+    else if (_currentFlashcard != null)
+    {   
+        <MudText Typo="Typo.h6" Class="mb-2">Fiszka @(_currentIndex + 1) z @(_sessionCards.Count)</MudText>
+        <MudPaper Elevation="3" Class="pa-4 mb-4">
+            <MudText Class="mb-4">
+                @((MarkupString)FlashcardFormatter.FormatPage(_currentFlashcard.Front))
+            </MudText>
+        </MudPaper>
+
+        @if (_showBack)
+        {
+            <MudPaper Elevation="3" Class="pa-4 mb-4" Style="background-color: var(--mud-palette-background-grey);">
+                <MudText Typo="Typo.h5" Align="Align.Center" Style="min-height: 100px; display: flex; align-items: center; justify-content: center;">
+                    @((MarkupString)FormatJsonString(_currentFlashcard.Back))
+                </MudText>
+            </MudPaper>
+
+            <MudGrid Justify="Justify.SpaceEvenly" Class="mt-4">
+                <MudItem xs="6">
+                    <MudButton Variant="Variant.Filled" Color="Color.Error" FullWidth="true" OnClick="() => SubmitAnswer(false)">Nie wiem</MudButton>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudButton Variant="Variant.Filled" Color="Color.Success" FullWidth="true" OnClick="() => SubmitAnswer(true)">Wiem</MudButton>
+                </MudItem>
+            </MudGrid>
+        }
+        else
+        {
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="ShowBack">Pokaż odpowiedź</MudButton>
+        }
+    }
+    else
+    {
+        <MudAlert Severity="Severity.Info">Brak fiszek do nauki na dzisiaj. Zajrzyj jutro!</MudAlert>
+    }
+
+</MudContainer>
 
 @code {
+    private List<Flashcard> _sessionCards = new();
+    private Flashcard? _currentFlashcard;
+    private int _currentIndex = 0;
+    private bool _showBack = false;
+    private bool _isLoading = true;
+    private bool _sessionFinished = false;
 
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSessionCards();
+    }
+   
+
+    public static string FormatJsonString(string input)
+    {
+
+        input = input.Trim();
+        if (input.StartsWith("{") && input.EndsWith("}"))
+        {
+            input = input.Substring(1, input.Length - 2);
+        }
+        input = input.Replace("\"word\":\"", "<b>");
+        input = input.Replace("\",\"translation\":\"", "</b> - ");
+
+        //input = input.Replace(",", "<br/>");
+        input = input.Replace("\"", "");
+        input = input.Replace("example_Translation:", "");
+        
+
+        return input;
+    }
+
+    private async Task LoadSessionCards()
+    {
+        _isLoading = true;
+        _sessionFinished = false;
+        _currentIndex = 0;
+        _showBack = false;
+        try
+        {
+            _sessionCards = await FlashcardService.GetLearningSessionCardsAsync();
+            if (_sessionCards.Any())
+            {
+                _currentFlashcard = _sessionCards[_currentIndex];
+            }
+            else
+            {
+                _currentFlashcard = null; // No cards for today
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Błąd podczas ładowania sesji: {ex.Message}", Severity.Error);
+            _currentFlashcard = null;
+            _sessionCards.Clear();
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+        StateHasChanged(); // Ensure UI updates
+    }
+
+    private void ShowBack()
+    {
+        _showBack = true;
+        StateHasChanged();
+    }
+
+    private async Task SubmitAnswer(bool wasCorrect)
+    {
+        if (_currentFlashcard == null) return;
+
+        var request = new ProcessAnswerRequest
+        {
+            FlashcardId = _currentFlashcard.Id,
+            WasCorrect = wasCorrect
+        };
+
+        try
+        {
+            await FlashcardService.SubmitAnswerAsync(request);
+            
+            // Move to the next card or finish session
+            _currentIndex++;
+            if (_currentIndex < _sessionCards.Count)
+            {
+                _currentFlashcard = _sessionCards[_currentIndex];
+                _showBack = false; // Hide back for the new card
+            }
+            else
+            {
+                _currentFlashcard = null;
+                _sessionFinished = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Błąd podczas zapisywania odpowiedzi: {ex.Message}", Severity.Error);
+            // Optionally decide how to proceed: retry? skip card?
+        }
+        StateHasChanged();
+    }
+
+    private async Task StartNewSession()
+    {
+        await LoadSessionCards();
+    }
 }

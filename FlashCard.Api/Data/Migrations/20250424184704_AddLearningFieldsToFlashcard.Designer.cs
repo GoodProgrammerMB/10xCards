@@ -4,16 +4,19 @@ using FlashCard.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace FlashCard.Api.Migrations
+namespace FlashCard.Api.Data.Migrations
 {
     [DbContext(typeof(FlashCardDbContext))]
-    partial class FlashCardDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250424184704_AddLearningFieldsToFlashcard")]
+    partial class AddLearningFieldsToFlashcard
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,7 +36,7 @@ namespace FlashCard.Api.Migrations
                     b.Property<string>("Back")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<int>("CorrectAnswersInRow")
                         .HasColumnType("int");
@@ -44,7 +47,7 @@ namespace FlashCard.Api.Migrations
                     b.Property<string>("Front")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int?>("GenerationId")
                         .HasColumnType("int");

@@ -8,6 +8,8 @@ public interface IFlashcardService
     Task<List<Flashcard>> GetUserFlashcardsAsync();
     Task UpdateFlashcardAsync(int id, Flashcard flashcard);
     Task DeleteFlashcardAsync(int id);
+    Task<List<Flashcard>> GetLearningSessionCardsAsync();
+    Task SubmitAnswerAsync(ProcessAnswerRequest answerRequest);
 }
 
 public class FlashcardService : IFlashcardService
@@ -33,6 +35,17 @@ public class FlashcardService : IFlashcardService
     public async Task DeleteFlashcardAsync(int id)
     {
         var response = await _httpClient.DeleteAsync($"api/Flashcards/{id}");
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<List<Flashcard>> GetLearningSessionCardsAsync()
+    {
+        return await _httpClient.GetFromJsonAsync<List<Flashcard>>("api/Learning/session") ?? new List<Flashcard>();
+    }
+
+    public async Task SubmitAnswerAsync(ProcessAnswerRequest answerRequest)
+    {
+        var response = await _httpClient.PostAsJsonAsync("api/Learning/answer", answerRequest);
         response.EnsureSuccessStatusCode();
     }
 } 

@@ -4,16 +4,19 @@ using FlashCard.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace FlashCard.Api.Migrations
+namespace FlashCard.Api.Data.Migrations
 {
     [DbContext(typeof(FlashCardDbContext))]
-    partial class FlashCardDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250427185401_UpdateFlashcardColumns")]
+    partial class UpdateFlashcardColumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -8,6 +8,12 @@
 @inject IJSRuntime JSRuntime
 @attribute [Authorize]
 
+<style>
+    .mud-card-actions {
+        justify-content: space-evenly;
+    }
+</style>
+
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
     <MudPaper Class="pa-4">
         <MudForm @ref="form" Model="@request">
@@ -26,7 +32,7 @@
                 <MudSelectItem Value="@("gpt-3.5-turbo")">GPT-3.5 Turbo</MudSelectItem>
                 <MudSelectItem Value="@("gpt-3.5-turbo-16k")">GPT-3.5 Turbo 16K</MudSelectItem> *@
             </MudSelect>
-            <MudButton Color="Color.Primary" OnClick="GenerateFlashcards" Class="mt-4" Disabled="@isLoading">
+            <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="GenerateFlashcards" Class="mt-4" Disabled="@isLoading">
                 @if (isLoading)
                 {
                     <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
@@ -42,7 +48,7 @@
 
     @if (isLoading)
     {
-        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-4" />
+        <MudProgressLinear  Color="Color.Primary" Indeterminate="true" Class="my-4" />
     }
 
     @if (flashcards != null && flashcards.Any())
@@ -55,18 +61,30 @@
                     <MudListItem T="GeneratedFlashcard" Value="@flashcard">
                         <MudCard>
                             <MudCardContent>
-                                <MudText Typo="Typo.body1"><strong>Pytanie:</strong> @flashcard.FrontDisplay</MudText>
-                                <MudText Typo="Typo.body1"><strong>Odpowiedź:</strong> @flashcard.BackDisplay</MudText>
+                                <MudText Typo="Typo.body1"> @((MarkupString)FlashcardFormatter.FormatFlashcard(flashcard.FrontDisplay))</MudText>
+                                <MudText Typo="Typo.body1"> @((MarkupString)FlashcardFormatter.FormatExampleTranslation(flashcard.BackDisplay))</MudText>
                             </MudCardContent>
                             <MudCardActions>
-                                <MudButton OnClick="@(() => EditFlashcard(flashcard))">Edytuj</MudButton>
-                                <MudButton OnClick="@(() => DeleteFlashcard(flashcard))">Usuń</MudButton>
+
+                                <MudButton StartIcon="@Icons.Material.Filled.Edit"
+                                           Color="Color.Primary"
+                                           Variant="Variant.Filled"
+                                           OnClick="@(() => EditFlashcard(flashcard))">
+                                    Edytuj
+                                </MudButton>
+                                <MudButton StartIcon="@Icons.Material.Filled.Delete"
+                                           Color="Color.Error"
+                                           Variant="Variant.Filled"
+                                           OnClick="@(() => DeleteFlashcard(flashcard))">
+                                    Usuń
+                                </MudButton>
+                                
                             </MudCardActions>
                         </MudCard>
                     </MudListItem>
                 }
             </MudList>
-            <MudButton Color="Color.Primary" 
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" 
                       OnClick="SaveFlashcards" 
                       Class="mt-4" 
                       Disabled="@(isLoading || !flashcards.Any())">
@@ -132,7 +150,7 @@
             ["Flashcard"] = flashcard
         };
 
-        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Large};
         var dialog = DialogService.Show<FlashcardEditDialog>("Edytuj fiszkę", parameters, options);
         var result = await dialog.Result;
 

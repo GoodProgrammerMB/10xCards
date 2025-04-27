@@ -8,11 +8,11 @@ public class Flashcard
     public int Id { get; set; }
     
     [Required]
-    [MaxLength(200)]
+    [Column(TypeName = "nvarchar(max)")]
     public string Front { get; set; } = string.Empty;
     
     [Required]
-    [MaxLength(500)]
+    [Column(TypeName = "nvarchar(max)")]
     public string Back { get; set; } = string.Empty;
     
     [Required]
@@ -32,6 +32,12 @@ public class Flashcard
     
     [ForeignKey(nameof(GenerationId))]
     public virtual Generation? Generation { get; set; }
+    
+    // Learning related properties
+    public DateTime? LastReviewedAt { get; set; }
+    public DateTime? NextReviewAt { get; set; }
+    public int CorrectAnswersInRow { get; set; } = 0;
+    public bool IsLearned { get; set; } = false;
     
     public Flashcard()
     {
