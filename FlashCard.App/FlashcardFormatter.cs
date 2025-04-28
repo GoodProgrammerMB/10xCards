@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 namespace FlashCard.App
 {
@@ -36,15 +37,27 @@ namespace FlashCard.App
                 var doc = JsonDocument.Parse(json);
                 var root = doc.RootElement;
 
-                string word = root.GetProperty("word").GetString();
-                string translation = root.GetProperty("translation").GetString();
-                string definition = root.GetProperty("definition").GetString();
-                string example = root.GetProperty("example").GetString();
+                string word = root.TryGetProperty("word", out var w) ? w.GetString() : null;
+                string translation = root.TryGetProperty("translation", out var t) ? t.GetString() : null;
+                string definition = root.TryGetProperty("definition", out var d) ? d.GetString() : null;
+                string example = root.TryGetProperty("example", out var e) ? e.GetString() : null;
+                string exampleTranslation = root.TryGetProperty("example_Translation", out var et) ? et.GetString() : null;
 
-                return $"Słowo: <b>{word}</b> - {translation} <br/> Definicja: {definition} <br/> Przykład: {example}";
-            }catch(Exception ex)
+                // Składanie tekstu tylko z dostępnych fragmentów
+                var parts = new List<string>();
+                if (word != null || translation != null)
+                    parts.Add($"Słowo: <b>{word}</b> - {translation}");
+                if (definition != null)
+                    parts.Add($"Definicja: {definition}");
+                if (example != null)
+                    parts.Add($"Przykład: {example}");
+                if (exampleTranslation != null)
+                    parts.Add($"Przykładowe tłumaczenie: {exampleTranslation}");
+
+                return string.Join(" <br/> ", parts);
+            }
+            catch (Exception ex)
             {
-                var d = ex;
                 return "";
             }
         }
@@ -74,18 +87,29 @@ namespace FlashCard.App
 
         public static string FormatPage(string input)
         {
-            string fixedJson = Regex.Replace(input, "(?<![,\\{\\n])\\s*\"(word|translation|definition|example)\"", ",\"$1\"");
+            try
+            {
+                string fixedJson = Regex.Replace(
+                    input,
+                    @"(?<![\,\{\n])\s*""(word|translation|definition|example)""",
+                    @",""$1"""
+                );
+                var doc = JsonDocument.Parse(fixedJson);
+                var root = doc.RootElement;
 
-            var doc = JsonDocument.Parse(fixedJson);
-            var root = doc.RootElement;
+                string word = root.GetProperty("word").GetString();
+                string translation = root.GetProperty("translation").GetString();
+                string definition = root.GetProperty("definition").GetString();
+                string example = root.GetProperty("example").GetString();
 
-            string word = root.GetProperty("word").GetString();
-            string translation = root.GetProperty("translation").GetString();
-            string definition = root.GetProperty("definition").GetString();
-            string example = root.GetProperty("example").GetString();
-
-            string html = $"SŁOWO: <b>{word}</b> - {translation} <br/> Definicja: {definition} <br/> Przykład: {example}";
-            return html;
+                string html = $"SŁOWO: <b>{word}</b> - {translation} <br/> Definicja: {definition} <br/> Przykład: {example}";
+                return html;
+            }
+            catch (Exception)
+            {
+                // Jeśli nie jest poprawnym JSON-em, zwróć oryginalny tekst
+                return input;
+            }
         }
     }
 }

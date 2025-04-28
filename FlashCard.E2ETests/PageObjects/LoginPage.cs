@@ -14,7 +14,7 @@ public class LoginPage
     private readonly string _loginTabSelector = "button:has-text('Logowanie')";
     private readonly string _emailInputSelector = "input[type='email']";
     private readonly string _passwordInputSelector = "input[type='password']";
-    private readonly string _loginButtonSelector = "button:has-text('Zaloguj')";
+    private readonly string _loginButtonSelector = "button:has-text('Zaloguj się'), button:has-text('Zaloguj')";
     private readonly string _errorMessageSelector = ".mud-alert";
     
     public LoginPage(IPage page, string baseUrl)
@@ -43,45 +43,30 @@ public class LoginPage
             Console.WriteLine("Strona załadowana, szukam zakładki Logowanie...");
             
             // Sprawdzamy, czy jesteśmy już na zakładce logowania
-            var inputs = await _page.QuerySelectorAllAsync("input");
-            if (inputs.Count >= 2)
+            var emailInput = await _page.QuerySelectorAsync(_emailInputSelector);
+            if (emailInput != null && await emailInput.IsVisibleAsync())
             {
-                // Szukamy pola email - jeśli jest, to prawdopodobnie już jesteśmy na zakładce logowania
-                var emailInput = await _page.QuerySelectorAsync(_emailInputSelector);
-                if (emailInput != null && await emailInput.IsVisibleAsync())
-                {
-                    Console.WriteLine("Już jesteśmy na zakładce logowania.");
-                    return;
-                }
+                Console.WriteLine("Już jesteśmy na zakładce logowania.");
+                return;
             }
             
             // Szukamy i klikamy zakładkę logowania
-            var buttons = await _page.QuerySelectorAllAsync("button");
-            Console.WriteLine($"Znaleziono {buttons.Count} przycisków:");
-            
-            foreach (var button in buttons)
+            var loginTab = await _page.QuerySelectorAsync(_loginTabSelector);
+            if (loginTab != null && await loginTab.IsVisibleAsync())
             {
-                var text = await button.TextContentAsync();
-                var isVisible = await button.IsVisibleAsync();
-                Console.WriteLine($"Przycisk: '{text}', widoczny: {isVisible}");
-                
-                if (text != null && text.Contains("Logowanie") && isVisible)
-                {
-                    Console.WriteLine("Znaleziono przycisk Logowanie, klikam...");
-                    await button.ClickAsync();
-                    break;
-                }
+                Console.WriteLine("Klikam zakładkę logowania...");
+                await loginTab.ClickAsync();
+                await Task.Delay(1000);
             }
             
             // Czekamy na załadowanie formularza
-            Console.WriteLine("Oczekiwanie po kliknięciu zakładki logowania...");
-            await Task.Delay(3000);
+            await Task.Delay(2000);
             
             // Zrzut ekranu dla diagnostyki
             await _page.ScreenshotAsync(new PageScreenshotOptions { Path = "login-tab-clicked.png" });
             
             // Wypisujemy znalezione pola input
-            inputs = await _page.QuerySelectorAllAsync("input");
+            var inputs = await _page.QuerySelectorAllAsync("input");
             Console.WriteLine($"Znaleziono {inputs.Count} pól input po przejściu do zakładki logowania:");
             foreach (var input in inputs)
             {
@@ -116,33 +101,26 @@ public class LoginPage
             await _page.ScreenshotAsync(new PageScreenshotOptions { Path = "before-login.png" });
             
             // Wypełniamy formularz - używając metody z polami input
-            var inputs = await _page.QuerySelectorAllAsync("input");
-            if (inputs.Count >= 2)
+            var emailInput = await _page.QuerySelectorAsync(_emailInputSelector);
+            if (emailInput == null)
             {
-                // Zakładamy, że pierwsze pole to email, drugie to hasło
-                await inputs[0].FillAsync(email);
+                // Fallback: szukaj input[type='text']
+                emailInput = await _page.QuerySelectorAsync("input[type='text']");
+            }
+            var passwordInput = await _page.QuerySelectorAsync(_passwordInputSelector);
+            if (emailInput != null && passwordInput != null)
+            {
+                await emailInput.FillAsync(email);
                 Console.WriteLine("Wypełniono pole email");
-                await Task.Delay(1000);
+                await Task.Delay(500);
                 
-                await inputs[1].FillAsync(password);
+                await passwordInput.FillAsync(password);
                 Console.WriteLine("Wypełniono pole hasła");
-                await Task.Delay(1000);
+                await Task.Delay(500);
             }
             else
             {
-                // Metoda alternatywna z klawiaturą
-                Console.WriteLine("Nie znaleziono pól, używam metody z klawiaturą");
-                if (inputs.Count > 0)
-                {
-                    await inputs[0].ClickAsync();
-                    await _page.Keyboard.TypeAsync(email);
-                    await _page.Keyboard.PressAsync("Tab");
-                    await _page.Keyboard.TypeAsync(password);
-                }
-                else
-                {
-                    throw new Exception("Nie znaleziono pól formularza");
-                }
+                throw new Exception("Nie znaleziono pól email lub hasła");
             }
             
             // Zrzut ekranu po wypełnieniu formularza
@@ -150,21 +128,7 @@ public class LoginPage
             
             // Szukamy przycisku logowania
             Console.WriteLine("Szukam przycisku logowania...");
-            var buttons = await _page.QuerySelectorAllAsync("button");
-            var loginButton = null as IElementHandle;
-            
-            foreach (var button in buttons)
-            {
-                var text = await button.TextContentAsync();
-                var isVisible = await button.IsVisibleAsync();
-                Console.WriteLine($"Przycisk: '{text}', widoczny: {isVisible}");
-                
-                if (text != null && (text.Contains("Zaloguj") || text.Contains("Login")) && isVisible)
-                {
-                    loginButton = button;
-                    break;
-                }
-            }
+            var loginButton = await _page.QuerySelectorAsync(_loginButtonSelector);
             
             if (loginButton == null)
             {

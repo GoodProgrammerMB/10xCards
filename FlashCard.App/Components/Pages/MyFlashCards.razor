@@ -114,8 +114,11 @@
             ["Flashcard"] = flashcard
         };
 
-        var dialog = await DialogService.ShowAsync<FlashcardEditDialog>("Edytuj fiszkę", parameters);
+
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Large };
+        var dialog = DialogService.Show<FlashcardEditDialog>("Edytuj fiszkę", parameters, options);
         var result = await dialog.Result;
+
 
         if (!result.Canceled)
         {

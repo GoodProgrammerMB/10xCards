@@ -25,8 +25,8 @@
                      Class="mt-3" />
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Anuluj</MudButton>
-        <MudButton Color="Color.Primary" OnClick="Submit">Zapisz</MudButton>
+        <MudButton Variant="Variant.Filled" OnClick="Cancel">Anuluj</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Submit">Zapisz</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -54,8 +54,8 @@
         else if (isNormalFlashcard)
         {
             var flashcard = (Flashcard)Flashcard;
-            frontText = flashcard.Front;
-            backText = flashcard.Back;
+            frontText = FlashcardFormatter.FormatFlashcard(flashcard.Front);
+            backText = FlashcardFormatter.FormatFlashcard(flashcard.Back);
         }
     }
 
